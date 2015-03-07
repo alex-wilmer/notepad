@@ -1,0 +1,88 @@
+global-reset()
+
+*,
+*:before,
+*:after
+  box-sizing border-box
+
+small = 700px
+menuWidth = 200px
+
+$center
+  position relative
+  top 50%
+  transform translateY(-50%)
+
+$floatLeft
+  float left
+
+$fullHeight
+  height 100%
+
+html,
+body
+  @extend $fullHeight
+
+body
+  background-color #2f2f2f
+  font-family: 'Bangers', cursive;
+
+.wrapper
+  @extend $center
+  height 80vh
+  margin 0 50px
+
+.header
+  height 10vh
+  line-height 10vh
+  padding-left 10px
+  font-size 2em
+  letter-spacing 2px
+  color #6D931C
+  user-select none
+  cursor pointer
+  transition all 0.3s ease
+
+.header:hover
+  background-color #353734
+  color #85ac46
+
+.menu
+  @extend $floatLeft
+  background-color rgb(40, 50, 50)
+  width menuWidth
+  height 70vh
+  border-right none
+  +below(small)
+    display none
+
+.instrument
+  @extend $floatLeft
+  width "calc(100% - %s)" % menuWidth
+  +below(small)
+    width 100%
+
+.note
+  height calc(70vh / 12)
+  cursor pointer
+
+.note.active
+  animation noteWarble 0.4s infinite
+
+@keyframes noteWarble  {
+  0% {
+    background-color: green
+  }
+  20% {
+    background-color: #af03d1
+  }
+  50% {
+    background-color: white
+  }
+  80% {
+    background-color: #39b848
+  }
+  100% {
+    background-color: purple
+  }
+}

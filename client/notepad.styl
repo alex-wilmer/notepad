@@ -56,11 +56,16 @@ body
   +below(small)
     display none
 
-.instrument
+#notepad
   @extend $floatLeft
+  height 70vh
   width "calc(100% - %s)" % menuWidth
   +below(small)
     width 100%
+
+  canvas
+    width 100% !important
+    height 100% !important
 
 .note
   height calc(70vh / 12)
@@ -74,15 +79,15 @@ body
     background-color: green
   }
   20% {
-    background-color: #af03d1
+    background-color: yellow
   }
-  50% {
+  40% {
     background-color: white
   }
-  80% {
-    background-color: #39b848
+  60% {
+    background-color: blue
   }
-  100% {
+  80% {
     background-color: purple
   }
 }

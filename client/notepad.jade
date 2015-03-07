@@ -1,16 +1,16 @@
 head
   title NotePad
   meta(name='viewport' content='width=device-width')
-  link(href='http://fonts.googleapis.com/css?family=Bangers' rel='stylesheet' type='text/css')  
-  
+  //link(href='http://fonts.googleapis.com/css?family=Bangers' rel='stylesheet' type='text/css')
+  script(src='//cdn.jsdelivr.net/phaser/2.2.2/phaser.js')
+    
 body
   +notepad
   
 template(name='notepad')
   .wrapper
-    .header.z-depth-1
-      | CCPS613-NotePad
+    .header.z-depth-3
+      | NotePad
     .menu.z-depth-2
-    .notepad.z-depth-3
-      +each notes
-        .note
+    #notepad.z-depth-1
+    

@@ -1,7 +1,7 @@
 head
   title NotePad
   meta(name='viewport' content='width=device-width')
-  //link(href='http://fonts.googleapis.com/css?family=Bangers' rel='stylesheet' type='text/css')
+  link(href='http://fonts.googleapis.com/css?family=Bangers' rel='stylesheet' type='text/css')
   script(src='//cdn.jsdelivr.net/phaser/2.2.2/phaser.js')
     
 body
@@ -9,8 +9,9 @@ body
   
 template(name='notepad')
   .wrapper
-    .header.z-depth-3
+    .header.z-depth-1
       | NotePad
     .menu.z-depth-2
-    #notepad.z-depth-1
+    canvas#reveal-layer.notepad.z-depth-2
+    canvas#touch-layer.notepad.z-depth-3
     

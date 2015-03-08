@@ -56,8 +56,10 @@ body
   +below(small)
     display none
 
-#notepad
+.notepad
   @extend $floatLeft
+  position absolute
+  left 0
   height 70vh
   width "calc(100% - %s)" % menuWidth
   +below(small)
@@ -71,7 +73,8 @@ body
   height calc(70vh / 12)
   cursor pointer
 
-.note.active
+#reveal-layer
+  display none
   animation noteWarble 0.4s infinite
 
 @keyframes noteWarble  {

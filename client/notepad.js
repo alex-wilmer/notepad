@@ -1,10 +1,11 @@
 Template.notepad.rendered = function() {
-  var notepad = document.getElementById("touch-layer")
+  var soundSprite = new Audio('//a.clyp.it/h1lz1juv.mp3')
+    , noteFrame = undefined
+    , notepad = document.getElementById("touch-layer")
     , context = notepad.getContext('2d')
     , clicking = false
-    , touches = []
-    , notes = []
     , noteHeight = 13
+    , reversedNotes = []
 
     , drawNotes = function (noteHeight) {
         for (var i = 0; i < noteHeight; i++) {
@@ -17,6 +18,21 @@ Template.notepad.rendered = function() {
       }
 
     , playNote = function(y, height) {
+
+        // trigger audio loop
+        if (!noteFrame) {
+          noteFrame = reversedNotes[Math.floor(y / height)] * 10;
+          soundSprite.currentTime = noteFrame;
+          soundSprite.play();
+          setInterval(function() {
+            soundSprite.currentTime = noteFrame;
+            console.log(soundSprite.currentTime);
+          }, 4000);
+        }
+
+        noteFrame = reversedNotes[Math.floor(y / height)] * 10;
+        soundSprite.currentTime = noteFrame;
+
         context.beginPath();
         context.clearRect(0, y, context.canvas.clientWidth, height);
       }
@@ -48,6 +64,8 @@ Template.notepad.rendered = function() {
     , mouseup = function (event) {
         console.log('mouseup');
         clicking = false;
+        noteFrame = 13 * 10
+        soundSprite.currentTime = noteFrame;
         drawNotes(noteHeight);
         toggleGrid(noteHeight);
       }
@@ -61,6 +79,8 @@ Template.notepad.rendered = function() {
 
     , touchend = function (event) {
         event.preventDefault();
+        noteFrame = 13 * 10;
+        soundSprite.currentTime = noteFrame;
         drawNotes(noteHeight);
         toggleGrid(noteHeight);
       }
@@ -92,9 +112,13 @@ Template.notepad.rendered = function() {
   notepad.addEventListener("touchmove", touchmove, false);
 
   // initialize
-
   notepad.width = context.canvas.clientWidth;
   notepad.height = context.canvas.clientHeight;
+
+  for(var i = 0; i < noteHeight; i++) {
+    reversedNotes[i] = i;
+  }
+  reversedNotes = reversedNotes.reverse();
   drawNotes(noteHeight);
   toggleGrid(noteHeight);
   $('#reveal-layer').show();

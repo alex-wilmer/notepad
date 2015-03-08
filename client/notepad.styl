@@ -59,11 +59,12 @@ body
 .notepad
   @extend $floatLeft
   position absolute
-  left 0
+  left menuWidth
   height 70vh
   width "calc(100% - %s)" % menuWidth
   +below(small)
     width 100%
+    left 0
 
   canvas
     width 100% !important

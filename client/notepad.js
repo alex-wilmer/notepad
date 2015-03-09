@@ -1,48 +1,39 @@
 Template.notepad.rendered = function() {
-  var soundSprite = new Audio('//a.clyp.it/h1lz1juv.mp3')
-    , noteFrame = undefined
+  var audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    , oscillator = audioContext.createOscillator()
+    , frequency = 1000
+    , waveShape = 'sine'
+    , gain = audioContext.createGain()
     , notepad = document.getElementById("touch-layer")
-    , context = notepad.getContext('2d')
+    , canvasContext = notepad.getContext('2d')
     , clicking = false
     , noteHeight = 13
-    , reversedNotes = []
 
     , drawNotes = function (noteHeight) {
         for (var i = 0; i < noteHeight; i++) {
           noteY = notepad.height / noteHeight;
-          context.beginPath();
-          context.rect(0, i * noteY, notepad.width, noteY);
-          context.fillStyle = '#2b2b2b';
-          context.fill();
+          canvasContext.beginPath();
+          canvasContext.rect(0, i * noteY, notepad.width, noteY);
+          canvasContext.fillStyle = '#2b2b2b';
+          canvasContext.fill();
         }
       }
 
     , playNote = function(y, height) {
 
-        // trigger audio loop
-        if (!noteFrame) {
-          noteFrame = reversedNotes[Math.floor(y / height)] * 10;
-          soundSprite.currentTime = noteFrame;
-          soundSprite.play();
-          setInterval(function() {
-            soundSprite.currentTime = noteFrame;
-            console.log(soundSprite.currentTime);
-          }, 4000);
-        }
-
-        noteFrame = reversedNotes[Math.floor(y / height)] * 10;
-        soundSprite.currentTime = noteFrame;
-
-        context.beginPath();
-        context.clearRect(0, y, context.canvas.clientWidth, height);
+        oscillator.frequency.value = (Math.floor(y / height) * 100) + 200;
+        console.log(oscillator.frequency.value);
+        gain.gain.value = 1;
+        canvasContext.beginPath();
+        canvasContext.clearRect(0, y, canvasContext.canvas.clientWidth, height);
       }
 
     , toggleGrid = function(noteHeight) {
         for (var i = 1; i < noteHeight; i++) {
-          context.beginPath();
-          context.moveTo(0, i * (notepad.height / noteHeight));
-          context.lineTo(context.canvas.clientWidth, i * (notepad.height / noteHeight));
-          context.stroke();
+          canvasContext.beginPath();
+          canvasContext.moveTo(0, i * (notepad.height / noteHeight));
+          canvasContext.lineTo(canvasContext.canvas.clientWidth, i * (notepad.height / noteHeight));
+          canvasContext.stroke();
         }
       }
 
@@ -62,25 +53,22 @@ Template.notepad.rendered = function() {
       }
 
     , mouseup = function (event) {
-        console.log('mouseup');
         clicking = false;
-        noteFrame = 13 * 10
-        soundSprite.currentTime = noteFrame;
+        gain.gain.value = 0;
         drawNotes(noteHeight);
         toggleGrid(noteHeight);
       }
 
     , touchstart = function (event) {
         event.preventDefault();
-        noteY = context.canvas.clientHeight / noteHeight;
+        noteY = canvasContext.canvas.clientHeight / noteHeight;
         clickedNote = Math.floor((event.targetTouches[0].pageY - $('#touch-layer').offset().top) / noteY);
         playNote(noteY * clickedNote, noteY);
       }
 
     , touchend = function (event) {
         event.preventDefault();
-        noteFrame = 13 * 10;
-        soundSprite.currentTime = noteFrame;
+        gain.gain.value = 0;
         drawNotes(noteHeight);
         toggleGrid(noteHeight);
       }
@@ -97,7 +85,7 @@ Template.notepad.rendered = function() {
 
     , touchmove = function (event) {
         event.preventDefault();
-        noteY = context.canvas.clientHeight / noteHeight;
+        noteY = canvasContext.canvas.clientHeight / noteHeight;
         clickedNote = Math.floor((event.targetTouches[0].pageY - $('#touch-layer').offset().top) / noteY);
         playNote(noteY * clickedNote, noteY);
       };
@@ -111,15 +99,19 @@ Template.notepad.rendered = function() {
   notepad.addEventListener("touchleave", touchleave, false);
   notepad.addEventListener("touchmove", touchmove, false);
 
-  // initialize
-  notepad.width = context.canvas.clientWidth;
-  notepad.height = context.canvas.clientHeight;
+  // initialize canvas
+  notepad.width = canvasContext.canvas.clientWidth;
+  notepad.height = canvasContext.canvas.clientHeight;
 
-  for(var i = 0; i < noteHeight; i++) {
-    reversedNotes[i] = i;
-  }
-  reversedNotes = reversedNotes.reverse();
   drawNotes(noteHeight);
   toggleGrid(noteHeight);
   $('#reveal-layer').show();
+
+  // initialize audio
+  gain.gain.value = 0;
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+  oscillator.type = waveShape;
+  oscillator.frequency.value = frequency; // value in hertz
+  oscillator.start();
 }

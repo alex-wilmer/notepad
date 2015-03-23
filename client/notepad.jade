@@ -2,20 +2,34 @@ head
   title NotePad
   meta(name='viewport' content='width=device-width')
   link(href='http://fonts.googleapis.com/css?family=Bangers' rel='stylesheet' type='text/css')
+  link(href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css')
   link(rel='stylesheet' href='//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css')
   script(src='//cdn.jsdelivr.net/phaser/2.2.2/phaser.js')
-    
+
 body
   +notepad
-  
+
 template(name='notepad')
+  header
+    .loginButtons
+      .sign-in Sign In
+      .sign-up Sign Up
+
   .wrapper
     .header.z-depth-1
       | NotePad
+
     .menu.z-depth-2
-      .octave 
+      .octave
         .label OCTAVE
         .value #{octave}
+        .controls
+          i.fa.fa-chevron-left
+          i.fa.fa-chevron-right
+
+      .rootnote
+        .label ROOTNOTE
+        .value #{rootnote}
         .controls
           i.fa.fa-chevron-left
           i.fa.fa-chevron-right

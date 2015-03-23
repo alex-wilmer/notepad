@@ -27,6 +27,30 @@ body
   background-color #2f2f2f
   font-family: 'Bangers', cursive;
 
+header
+  position fixed
+  line-height 80px
+  height 80px
+  width 100%
+
+  .loginButtons
+    float right
+    padding-right 50px
+
+  .loginButtons > *
+    display inline-block
+    cursor pointer
+    color #a8f5cb
+    font-family 'Open Sans', sans-serif
+    font-size 0.8em
+    transition color 0.3s ease
+
+  .loginButtons > *:hover
+    color #25a16b
+
+  .loginButtons > * + *
+    margin-left 20px
+
 .wrapper
   @extend $center
   height 80vh
@@ -58,6 +82,9 @@ body
   border-right none
   +below(small)
     display none
+
+  & *
+    user-select none
 
   .label
     transform translateY(10px)

@@ -1,4 +1,6 @@
 Meteor.startup(function() {
+  Session.set('notes', [1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 10, 11, 12]);
+  Session.set('rootnote', 0);
   Session.set('baseFrequency', 27.5);
   Session.set('noteHeight', 13);
   Session.set('octave',  1);
@@ -9,6 +11,10 @@ Template.notepad.helpers({
   octave: function() {
     return Session.get('octave');
   }
+
+, rootnote: function() {
+    return Session.get('notes')[Session.get('rootnote')];
+  }
 });
 
 Template.notepad.events({
@@ -17,6 +23,25 @@ Template.notepad.events({
       event.target.className.indexOf('left') > -1
       ? Session.get('octave') - 1
       : Session.get('octave') + 1
+    );
+  }
+
+, 'click .rootnote i': function (event) {
+    Session.set('rootnote',
+      (function() {
+        var current = Session.get('rootnote');
+        current = event.target.className.indexOf('left') > -1
+         ? current - 1
+         : current + 1;
+        switch (current) {
+          case -1:
+            return 12;
+          case 13:
+            return 0;
+          default:
+            return current;
+        };
+      })()
     );
   }
 });
@@ -34,7 +59,7 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
   , gain = audioContext.createGain()
 
   // canvas
-  , notepad = document.getElementById("touch-layer")
+  , notepad = document.getElementById('touch-layer')
   , canvasContext = notepad.getContext('2d')
 
   , drawNotes = function (noteHeight) {
@@ -140,16 +165,15 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
       playNote(noteY * clickedNote, noteY);
     };
 
-
   // hookup event handlers
-  notepad.addEventListener("mousedown", mousedown, false);
-  notepad.addEventListener("mousemove", mousemove, false);
-  notepad.addEventListener("mouseup", mouseup, false);
-  notepad.addEventListener("touchstart", touchstart, false);
-  notepad.addEventListener("touchend", touchend, false);
-  notepad.addEventListener("touchcancel", touchcancel, false);
-  notepad.addEventListener("touchleave", touchleave, false);
-  notepad.addEventListener("touchmove", touchmove, false);
+  notepad.addEventListener('mousedown', mousedown, false);
+  notepad.addEventListener('mousemove', mousemove, false);
+  notepad.addEventListener('mouseup', mouseup, false);
+  notepad.addEventListener('touchstart', touchstart, false);
+  notepad.addEventListener('touchend', touchend, false);
+  notepad.addEventListener('touchcancel', touchcancel, false);
+  notepad.addEventListener('touchleave', touchleave, false);
+  notepad.addEventListener('touchmove', touchmove, false);
 
   // initialize canvas
   notepad.width = canvasContext.canvas.clientWidth;

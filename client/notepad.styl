@@ -49,12 +49,34 @@ body
 
 .menu
   @extend $floatLeft
+  position relative
   background-color rgb(40, 50, 50)
+  color rgb(33, 199, 148)
+  font-size 1.5em
   width menuWidth
   height 70vh
   border-right none
   +below(small)
     display none
+
+  .label
+    transform translateY(10px)
+
+  .value
+    transform translateY(14px)
+
+  .controls > *
+    display inline-block
+    cursor pointer
+
+  .controls > *:hover
+    color yellow
+
+  .controls > *:first-child
+    transform translateX(-10px) translateY(-10px)
+
+  .controls > *:last-child
+    transform translateX(10px) translateY(-10px)
 
 .notepad
   @extend $floatLeft
@@ -62,6 +84,7 @@ body
   left menuWidth
   height 70vh
   width "calc(100% - %s)" % menuWidth
+  cursor pointer
   +below(small)
     width 100%
     left 0

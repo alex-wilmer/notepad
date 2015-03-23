@@ -1,0 +1,189 @@
+// fonts
+@import url(http://fonts.googleapis.com/css?family=Varela+Round|Open+Sans:300);
+
+// colours
+@knob-colour: #181818;
+@light-colour: #a8d8f8;
+
+// mixins (mainly LESS Elements)
+.gradient(@color: #F5F5F5, @start: #EEE, @stop: #FFF) {
+  background: @color;
+  background: -webkit-gradient(linear, left bottom, left top, color-stop(0, @start), color-stop(1, @stop));
+  background: -ms-linear-gradient(bottom, @start, @stop);
+  background: -moz-linear-gradient(center bottom, @start 0%, @stop 100%);
+  background: -o-linear-gradient(@stop, @start);
+  filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",@stop,@start));
+}
+
+.box-shadow(@arguments) {
+  -webkit-box-shadow: @arguments;
+  -moz-box-shadow: @arguments;
+  box-shadow: @arguments;
+}
+
+.transform(@arguments) {
+  -webkit-transform: @arguments;
+  -moz-transform: @arguments;
+  -o-transform: @arguments;
+  -ms-transform: @arguments;
+  transform: @arguments;
+}
+
+.transition(@arguments) {
+  -webkit-transition: @arguments;
+  -moz-transition: @arguments;
+  -o-transition: @arguments;
+  transition: @arguments;
+}
+
+// main styles
+body {
+  background-color: @knob-colour;
+  font-size: 100%;
+  font-family: "Open Sans", sans-serif;
+  color: #aaa;
+  text-align: center;
+}
+
+.knob-surround {
+  position: relative;
+  background-color: grey;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: solid .25em darken(@knob-colour, 4%);
+  margin: 5em auto;
+  .gradient(@knob-colour, lighten(@knob-colour, 2%), darken(@knob-colour, 2%));
+  .box-shadow(
+    0 .2em .1em .05em rgba(255,255,255,.1) inset,
+    0 -.2em .1em .05em rgba(0,0,0,.5) inset,
+    0 .5em .65em 0 rgba(0,0,0,.3);
+  );
+}
+
+.knob {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  .transform(rotate(0deg));
+  z-index: 10;
+}
+
+.knob:before {
+  content: "";
+  position: absolute;
+  bottom: 19%;
+  left: 19%;
+  width: 3%;
+  height: 3%;
+  background-color: @light-colour;
+  border-radius: 50%;
+  .box-shadow(0 0 .4em 0 darken(@light-colour, 10%));
+}
+
+.min,
+.max {
+  display: block;
+  font-family: "Varela Round", sans-serif;
+  color: rgba(255,255,255,.4);
+  text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
+  font-size: 70%;
+  position: absolute;
+  opacity: .5;
+}
+
+.min {
+  bottom: 1em;
+  left: -2.5em;
+}
+
+.max {
+  bottom: 1em;
+  right: -2.5em;
+}
+
+.tick {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  overflow: visible;
+}
+
+.tick:after {
+  content: "";
+  width: .08em;
+  height: .6em;
+  background-color: rgba(255,255,255,.2);
+  position: absolute;
+  top: -1.5em;
+  left: 50%;
+  .transition(all 180ms ease-out);
+}
+
+.activetick:after {
+  background-color: @light-colour;
+  .box-shadow(0 0 .3em .08em darken(@light-colour, 10%));
+  .transition(all 50ms ease-in);
+}
+
+// yeah, I know, use SASS  :)
+.tick:nth-child(1)  { .transform(rotate(-135deg)); }
+.tick:nth-child(2)  { .transform(rotate(-125deg)); }
+.tick:nth-child(3)  { .transform(rotate(-115deg)); }
+.tick:nth-child(4)  { .transform(rotate(-105deg)); }
+.tick:nth-child(5)  { .transform(rotate(-95deg));  }
+.tick:nth-child(6)  { .transform(rotate(-85deg));  }
+.tick:nth-child(7)  { .transform(rotate(-75deg));  }
+.tick:nth-child(8)  { .transform(rotate(-65deg));  }
+.tick:nth-child(9)  { .transform(rotate(-55deg));  }
+.tick:nth-child(10) { .transform(rotate(-45deg));  }
+.tick:nth-child(11) { .transform(rotate(-35deg));  }
+.tick:nth-child(12) { .transform(rotate(-25deg));  }
+.tick:nth-child(13) { .transform(rotate(-15deg));  }
+.tick:nth-child(14) { .transform(rotate(-5deg));   }
+.tick:nth-child(15) { .transform(rotate(5deg));    }
+.tick:nth-child(16) { .transform(rotate(15deg));   }
+.tick:nth-child(17) { .transform(rotate(25deg));   }
+.tick:nth-child(18) { .transform(rotate(35deg));   }
+.tick:nth-child(19) { .transform(rotate(45deg));   }
+.tick:nth-child(20) { .transform(rotate(55deg));   }
+.tick:nth-child(21) { .transform(rotate(65deg));   }
+.tick:nth-child(22) { .transform(rotate(75deg));   }
+.tick:nth-child(19) { .transform(rotate(45deg));   }
+.tick:nth-child(20) { .transform(rotate(55deg));   }
+.tick:nth-child(21) { .transform(rotate(65deg));   }
+.tick:nth-child(22) { .transform(rotate(75deg));   }
+.tick:nth-child(23) { .transform(rotate(85deg));   }
+.tick:nth-child(24) { .transform(rotate(95deg));   }
+.tick:nth-child(25) { .transform(rotate(105deg));  }
+.tick:nth-child(26) { .transform(rotate(115deg));  }
+.tick:nth-child(27) { .transform(rotate(125deg));  }
+.tick:nth-child(28) { .transform(rotate(135deg));  }
+
+h1 {
+  font-weight: normal;
+  margin: 2em 0;
+}
+
+p {
+  line-height: 150%;
+  max-width: 36em;
+  margin: 1em auto;
+}
+
+a {
+  color: #aaa;
+  text-decoration: none;
+  border-bottom: 1px solid #444;
+  .transition(color .2s ease-in);
+}
+
+a:hover,
+a:focus {
+  color: #eee;
+}

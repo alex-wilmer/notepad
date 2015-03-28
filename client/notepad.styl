@@ -4,6 +4,7 @@ global-reset()
 *:before,
 *:after
   box-sizing border-box
+  user-select none
 
 small = 700px
 menuWidth = 200px
@@ -25,7 +26,13 @@ body
 
 body
   background-color #2f2f2f
-  font-family: 'Bangers', cursive;
+  font-family: 'Bangers', cursive
+
+.hidden
+  display none !important
+
+.shown
+  opacity 1
 
 header
   position fixed
@@ -33,23 +40,26 @@ header
   height 80px
   width 100%
 
-  .loginButtons
-    float right
-    padding-right 50px
+.loginButtons
+  float right
+  padding-right 50px
 
-  .loginButtons > *
-    display inline-block
-    cursor pointer
-    color #a8f5cb
-    font-family 'Open Sans', sans-serif
-    font-size 0.8em
-    transition color 0.3s ease
+.loginButtons > *
+  transition all 0.3s ease
 
-  .loginButtons > *:hover
-    color #25a16b
+[class^='sign']
+  display inline-block
+  cursor pointer
+  color #a8f5cb
+  font-family 'Open Sans', sans-serif
+  font-size 0.8em
+  transition color 0.3s ease
 
-  .loginButtons > * + *
-    margin-left 20px
+.loginButtons > * > *:hover
+  color white
+
+.loginButtons > * > * + *
+  margin-left 20px
 
 .wrapper
   @extend $center
@@ -62,14 +72,13 @@ header
   padding-left 10px
   font-size 2em
   letter-spacing 2px
-  color #6D931C
-  user-select none
+  color rgb(33, 199, 148)
   cursor pointer
   transition all 0.3s ease
 
 .header:hover
   background-color #353734
-  color #85ac46
+  color white
 
 .menu
   @extend $floatLeft
@@ -95,9 +104,10 @@ header
   .controls > *
     display inline-block
     cursor pointer
+    transition 0.3s ease
 
   .controls > *:hover
-    color yellow
+    color white
 
   .controls > *:first-child
     transform translateX(-10px) translateY(-10px)
@@ -112,6 +122,7 @@ header
   height 70vh
   width "calc(100% - %s)" % menuWidth
   cursor pointer
+
   +below(small)
     width 100%
     left 0

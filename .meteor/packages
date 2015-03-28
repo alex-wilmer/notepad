@@ -12,3 +12,5 @@ mquandalle:jade
 materialize:materialize
 jquery
 less
+accounts-base
+accounts-password

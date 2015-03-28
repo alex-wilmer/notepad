@@ -1,19 +1,47 @@
+// Pure Functions
+var flipSetPosition = function (n, first, last) {
+      return -n + first + last;
+    }
+
+  , getFrequency = function (baseFrequency, semitones) {
+      return baseFrequency * Math.pow(Math.pow(2, 1/12), semitones);
+    }
+
+  , mod = function (n, length) {
+      if (n > length) {
+        return 0;
+      }
+      if (n < 0) {
+        return length;
+      }
+      return n;
+    };
+
 Meteor.startup(function() {
-  Session.set('notes', [1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 10, 11, 12]);
+  Session.set('notes', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   Session.set('rootnote', 0);
   Session.set('baseFrequency', 27.5);
   Session.set('noteHeight', 13);
   Session.set('octave',  1);
-  Session.set('waveShape', 'square');
+  Session.set('waveShapes', ['sine', 'triangle', 'sawtooth', 'square']);
+  Session.set('waveShape', 2);
 });
 
 Template.notepad.helpers({
-  octave: function() {
+  octave: function () {
     return Session.get('octave');
   }
 
-, rootnote: function() {
-    return Session.get('notes')[Session.get('rootnote')];
+, rootnote: function () {
+    if (Session.get('notes')) {
+      return Session.get('notes')[Session.get('rootnote')];
+    }
+  }
+
+, waveshape: function () {
+    if (Session.get('waveShapes')) {
+      return Session.get('waveShapes')[Session.get('waveShape')];
+    }
   }
 });
 
@@ -21,8 +49,8 @@ Template.notepad.events({
   'click .octave i': function (event) {
     Session.set('octave',
       event.target.className.indexOf('left') > -1
-      ? Session.get('octave') - 1
-      : Session.get('octave') + 1
+        ? Session.get('octave') - 1
+        : Session.get('octave') + 1
     );
   }
 
@@ -31,17 +59,10 @@ Template.notepad.events({
       (function() {
         var current = Session.get('rootnote');
         current = event.target.className.indexOf('left') > -1
-         ? current - 1
-         : current + 1;
-        switch (current) {
-          case -1:
-            return 12;
-          case 13:
-            return 0;
-          default:
-            return current;
-        };
-      })()
+          ? current - 1
+          : current + 1;
+          return mod(current, 11);
+      }())
     );
   }
 });
@@ -72,18 +93,14 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
       }
     }
 
-  , flipSetPosition = function (n, first, last) {
-      return -n + first + last;
-    }
-
-  , getFrequency = function (baseFrequency, semitones) {
-      return baseFrequency * Math.pow(Math.pow(2, 1/12), semitones);
-    }
-
   , playNote = function (y, height) {
       // audio
       oscillator.frequency.value =
-        getFrequency(Session.get('baseFrequency') * Math.pow(2, Session.get('octave')), flipSetPosition(Math.floor(y / height), 0, 12));
+        getFrequency(
+          Session.get('baseFrequency') * Math.pow(2, Session.get('octave'))
+        , flipSetPosition(Math.floor(y / height), 0, 12) + Session.get('rootnote')
+        );
+
       console.log(oscillator.frequency.value);
       gain.gain.value = 1;
 
@@ -187,6 +204,7 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
   gain.gain.value = 0;
   oscillator.connect(gain);
   gain.connect(audioContext.destination);
-  oscillator.type = Session.get('waveShape');
+  oscillator.type = Session.get('waveShapes')[Session.get('waveShape')];
+
   oscillator.frequency.value = Session.get('baseFrequency'); // value in hertz
 }

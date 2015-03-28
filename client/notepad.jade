@@ -12,8 +12,15 @@ body
 template(name='notepad')
   header
     .loginButtons
-      .sign-in Sign In
-      .sign-up Sign Up
+      #default.shown
+        .sign-in Sign In
+        .sign-up Sign Up
+
+      #sign-in.hidden
+        input(placeholder='username')
+        input(placeholder='password' type='password')
+
+      #sign-up.hidden
 
   .wrapper
     .header.z-depth-1
@@ -30,6 +37,13 @@ template(name='notepad')
       .rootnote
         .label ROOTNOTE
         .value #{rootnote}
+        .controls
+          i.fa.fa-chevron-left
+          i.fa.fa-chevron-right
+
+      .waveshape
+        .label WAVESHAPE
+        .value #{waveshape}
         .controls
           i.fa.fa-chevron-left
           i.fa.fa-chevron-right

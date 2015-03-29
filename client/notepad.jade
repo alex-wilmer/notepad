@@ -11,11 +11,28 @@ body
 template(name='notepad')
   +login
 
+  .help
+    a.modal-trigger(href='#help')
+      i.mdi-action-help
+
+  #help.modal
+    .modal-content
+      h4 Welcome!
+      p.
+        Cupidatat velit magna id esse consectetur. Eu ea velit occaecat tempor veniam minim non incididunt adipisicing consectetur officia qui in. Fugiat qui ut exercitation dolor excepteur elit ad amet do consectetur. Occaecat officia adipisicing officia velit dolore tempor do. Anim sunt sit amet in incididunt non laboris sint minim consectetur ipsum elit. Qui id ex consectetur magna sint consectetur proident aliquip nulla Lorem nostrud enim quis nisi.
+
   .wrapper
     .header.z-depth-1
-      | NotePad
+      .switch
+        label
+          i.mdi-device-multitrack-audio(class='{{active}}')
+          input(type='checkbox' checked)
+          span.lever
+          i.mdi-av-queue-music
 
-    .menu.z-depth-2
+      span.title NotePad
+
+    .first-menu.menu.z-depth-2
       .volume
         .label VOLUME &nbsp; #{volume}
         p.range-field
@@ -45,6 +62,8 @@ template(name='notepad')
         select
           +each scales
             option(value='{{this}}') #{this}
+
+    .second-menu.menu(class='{{active}}')
 
     canvas#reveal-layer.notepad.z-depth-2
     canvas#touch-layer.notepad.z-depth-3

@@ -8,6 +8,7 @@ var flipSetPosition = function (n, first, last) {
     };
 
 Meteor.startup(function() {
+  Session.set('secondMenu', '');
   Session.set('volume', 80);
   Session.set('notes', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   Session.set('rootNote', 0);
@@ -32,7 +33,11 @@ Meteor.startup(function() {
 });
 
 Template.notepad.helpers({
-  volume: function () {
+  active: function () {
+    return Session.get('secondMenu');
+  }
+
+, volume: function () {
     return Session.get('volume');
   }
 
@@ -85,6 +90,10 @@ Template.notepad.events({
     Session.set('scale', scale);
     Session.set('noteHeight', scale.length);
   }
+
+, 'change .switch input': function (event) {
+    Session.set('secondMenu', Session.get('secondMenu') === '' ? 'active' : '');
+  }
 });
 
 Template.notepad.rendered = function() {
@@ -129,8 +138,6 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
       feedback.gain.value = Session.get('volume') / 100;
       gain.gain.value = Session.get('volume') / 100;
-
-      console.log(Session.get('delay'));
 
       // temporarily remove top layer
       canvasContext.beginPath();
@@ -221,12 +228,10 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
   , touchcancel = function (event) {
       event.preventDefault();
-      console.log('touchcancel');
     }
 
   , touchleave = function (event) {
       event.preventDefault();
-      console.log('touchleave');
     }
 
   , touchmove = function (event) {
@@ -294,5 +299,4 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
       toggleGrid(Session.get('noteHeight'));
     }, 0);
   });
-
 }

@@ -27,13 +27,28 @@ body
 
 body
   background-color #2f2f2f
-  text-align center
 
 .hidden
   display none !important
 
 .shown
   opacity 1
+
+.help
+  font-size 3em
+  position fixed
+  bottom 0
+  right 0
+  padding 20px
+  z-index 5
+
+  i
+    cursor pointer
+    color rgb(33, 199, 148)
+    transition color 0.3s ease
+
+.help i:hover
+  color white
 
 .wrapper
   @extend $center
@@ -43,7 +58,7 @@ body
 .header
   height 10vh
   line-height 10vh
-  padding-left 10px
+  padding 0 20px
   font-size 2em
   letter-spacing 2px
   color rgb(33, 199, 148)
@@ -53,6 +68,21 @@ body
 .header:hover
   background-color #353734
   color white
+
+.switch
+  display inline-block
+
+.switch i
+  transition color 0.3s ease
+
+.switch input:checked + .lever + i
+  color rgb(33, 199, 148)
+
+.switch i.active
+    color #CB30BD
+
+.title
+  float right
 
 .menu
   @extend $floatLeft
@@ -88,6 +118,15 @@ body
   .label
     transform translateY(10px)
 
+.second-menu
+  position absolute
+  transform translateX(100%)
+  transition transform 0.4s ease
+  background-color #322831
+
+.second-menu.active
+  transform translateX(0)
+
 .dropdown-content
   max-height 220px
 
@@ -98,6 +137,7 @@ body
 .modal-content,
 .dropdown-content li > span
   font-family 'Open Sans', sans-serif
+  text-align center
 
   .fa
     cursor pointer

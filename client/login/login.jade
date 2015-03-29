@@ -19,7 +19,22 @@ template(name='login')
       i.fa.fa-3x.fa-facebook
       i.fa.fa-3x.fa-google
 
+  #signOut.modal
+    .modal-content
+      h4 Are you sure?
+      a.cancel.waves-effect.waves-light.btn CANCEL
+      a.sign-out.waves-effect.waves-light.btn.red SIGN OUT
+
   header
-    .login-buttons
-      a.modal-trigger(href='#signIn') Sign In
-      a.modal-trigger(href='#signUp') Sign Up
+    if currentUser
+      .login-buttons
+        a.user-name Welcome #{userName}
+        a.modal-trigger(href='#signOut') Sign Out
+
+    else
+      .login-buttons
+        a.modal-trigger(href='#signIn') Sign In
+        a.modal-trigger(href='#signUp') Sign Up
+
+    if loggingIn
+        | Logging in...

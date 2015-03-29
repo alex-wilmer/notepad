@@ -6,6 +6,9 @@ head
   link(rel='stylesheet' href='//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css')
 
 body
+  a.github(href='https://github.com/alex-wilmer/notepad')
+    i.fa.fa-github.fa-3x
+
   +notepad
 
 template(name='notepad')
@@ -20,6 +23,21 @@ template(name='notepad')
       h4 Welcome!
       p.
         Cupidatat velit magna id esse consectetur. Eu ea velit occaecat tempor veniam minim non incididunt adipisicing consectetur officia qui in. Fugiat qui ut exercitation dolor excepteur elit ad amet do consectetur. Occaecat officia adipisicing officia velit dolore tempor do. Anim sunt sit amet in incididunt non laboris sint minim consectetur ipsum elit. Qui id ex consectetur magna sint consectetur proident aliquip nulla Lorem nostrud enim quis nisi.
+
+  #save.modal
+    .modal-content
+      h4 Save Patch
+      .input-field
+        input#patchName(type='text' autofocus)
+        label(for='patchName') New patch..
+      a.cancel.waves-effect.waves-light.btn.red CANCEL
+      a.sign-out.waves-effect.waves-light.btn SAVE
+
+  #load.modal
+    .modal-content
+      h4 Load Patch
+      a.cancel.waves-effect.waves-light.btn.red CANCEL
+      a.sign-out.waves-effect.waves-light.btn LOAD
 
   .wrapper
     .header.z-depth-1
@@ -62,6 +80,13 @@ template(name='notepad')
         select
           +each scales
             option(value='{{this}}') #{this}
+
+      .file
+        .load
+          a.waves-effect.waves-light.btn.modal-trigger(class='{{active}}' href='#load') LOAD
+
+        .save
+          a.waves-effect.waves-light.btn.modal-trigger(class='{{active}}' href='#save') SAVE
 
     .second-menu.menu(class='{{active}}')
 

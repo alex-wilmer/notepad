@@ -28,6 +28,18 @@ body
 body
   background-color #2f2f2f
 
+.github
+  position absolute
+  top 15px
+  left 15px
+  color silver
+  cursor pointer
+  transition color 0.3s ease
+  z-index 2
+
+.github:hover
+  color rgb(33, 199, 148)
+
 .hidden
   display none !important
 
@@ -39,7 +51,7 @@ body
   position fixed
   bottom 0
   right 0
-  padding 20px
+  padding 12px
   z-index 5
 
   i
@@ -117,6 +129,20 @@ body
 
   .label
     transform translateY(10px)
+
+.file
+  text-align center
+  margin-top 40px
+
+.file > div
+  display inline-block
+
+  .btn
+    padding 0 0.7rem
+    transition 0.4s ease
+
+  .btn.active
+    background-color #A62665
 
 .second-menu
   position absolute

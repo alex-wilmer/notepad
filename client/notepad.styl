@@ -40,11 +40,11 @@ header
   height 80px
   width 100%
 
-.loginButtons
+.login-buttons
   float right
   padding-right 50px
 
-.loginButtons > *
+.login-buttons > *
   transition all 0.3s ease
 
 [class^='sign']
@@ -55,10 +55,10 @@ header
   font-size 0.8em
   transition color 0.3s ease
 
-.loginButtons > * > *:hover
+.login-buttons > * > *:hover
   color white
 
-.loginButtons > * > * + *
+.login-buttons > * > * + *
   margin-left 20px
 
 .wrapper
@@ -83,6 +83,7 @@ header
 .menu
   @extend $floatLeft
   position relative
+  padding 20px
   background-color rgb(40, 50, 50)
   color rgb(33, 199, 148)
   font-size 1.5em
@@ -92,28 +93,23 @@ header
   +below(small)
     display none
 
+  input[type=range]
+    border none
+
+  input[type=range] + .thumb.active .value
+    color #fff
+    font-size 15px
+    position relative
+    top -10px
+
+  .thumb
+    display none
+
   & *
     user-select none
 
   .label
     transform translateY(10px)
-
-  .value
-    transform translateY(14px)
-
-  .controls > *
-    display inline-block
-    cursor pointer
-    transition 0.3s ease
-
-  .controls > *:hover
-    color white
-
-  .controls > *:first-child
-    transform translateX(-10px) translateY(-10px)
-
-  .controls > *:last-child
-    transform translateX(10px) translateY(-10px)
 
 .notepad
   @extend $floatLeft

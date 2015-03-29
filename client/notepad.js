@@ -5,21 +5,11 @@ var flipSetPosition = function (n, first, last) {
 
   , getFrequency = function (baseFrequency, semitones) {
       return baseFrequency * Math.pow(Math.pow(2, 1/12), semitones);
-    }
-
-  , mod = function (n, length) {
-      if (n > length) {
-        return 0;
-      }
-      if (n < 0) {
-        return length;
-      }
-      return n;
     };
 
 Meteor.startup(function() {
   Session.set('notes', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-  Session.set('rootnote', 0);
+  Session.set('rootNote', 0);
   Session.set('baseFrequency', 27.5);
   Session.set('noteHeight', 13);
   Session.set('octave',  1);
@@ -32,38 +22,38 @@ Template.notepad.helpers({
     return Session.get('octave');
   }
 
-, rootnote: function () {
+, rootNote: function () {
     if (Session.get('notes')) {
-      return Session.get('notes')[Session.get('rootnote')];
+      return Session.get('notes')[Session.get('rootNote')];
     }
   }
 
-, waveshape: function () {
+, rootNoteValue: function () {
+    return Session.get('rootNote');
+ }
+
+, waveShape: function () {
     if (Session.get('waveShapes')) {
       return Session.get('waveShapes')[Session.get('waveShape')];
     }
   }
+
+, waveShapeValue: function () {
+    return Session.get('waveShape');
+  }
 });
 
 Template.notepad.events({
-  'click .octave i': function (event) {
-    Session.set('octave',
-      event.target.className.indexOf('left') > -1
-        ? Session.get('octave') - 1
-        : Session.get('octave') + 1
-    );
+  'mousedown .octave input, mousemove .octave input': function (event) {
+    Session.set('octave', +event.target.value);
   }
 
-, 'click .rootnote i': function (event) {
-    Session.set('rootnote',
-      (function() {
-        var current = Session.get('rootnote');
-        current = event.target.className.indexOf('left') > -1
-          ? current - 1
-          : current + 1;
-          return mod(current, 11);
-      }())
-    );
+, 'mousedown .root-note input, mousemove .root-note input': function (event) {
+    Session.set('rootNote', +event.target.value);
+  }
+
+, 'mousedown .wave-shape input, mousemove .wave-shape input': function (event) {
+    Session.set('waveShape', +event.target.value);
   }
 });
 
@@ -98,10 +88,10 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
       oscillator.frequency.value =
         getFrequency(
           Session.get('baseFrequency') * Math.pow(2, Session.get('octave'))
-        , flipSetPosition(Math.floor(y / height), 0, 12) + Session.get('rootnote')
+        , flipSetPosition(Math.floor(y / height), 0, 12) + Session.get('rootNote')
         );
 
-      console.log(oscillator.frequency.value);
+      console.log(Session.get('rootNote'));
       gain.gain.value = 1;
 
       // temporarily remove top layer
@@ -180,6 +170,12 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
           (event.targetTouches[0].pageY - $('#touch-layer').offset().top) / noteY
         );
       playNote(noteY * clickedNote, noteY);
+    }
+
+  , setWaveShape = function () {
+      setTimeout(function() {
+        oscillator.type = Session.get('waveShapes')[Session.get('waveShape')];
+      }, 0);
     };
 
   // hookup event handlers
@@ -191,6 +187,9 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
   notepad.addEventListener('touchcancel', touchcancel, false);
   notepad.addEventListener('touchleave', touchleave, false);
   notepad.addEventListener('touchmove', touchmove, false);
+
+  // exposed variables
+  $('.wave-shape input').change(setWaveShape);
 
   // initialize canvas
   notepad.width = canvasContext.canvas.clientWidth;

@@ -1,17 +1,16 @@
 head
   title NotePad
   meta(name='viewport' content='width=device-width')
-  link(href='http://fonts.googleapis.com/css?family=Bangers' rel='stylesheet' type='text/css')
-  link(href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css')
+  link(href='//fonts.googleapis.com/css?family=Bangers' rel='stylesheet' type='text/css')
+  link(href='//fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css')
   link(rel='stylesheet' href='//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css')
-  script(src='//cdn.jsdelivr.net/phaser/2.2.2/phaser.js')
 
 body
   +notepad
 
 template(name='notepad')
   header
-    .loginButtons
+    .login-buttons
       #default.shown
         .sign-in Sign In
         .sign-up Sign Up
@@ -28,25 +27,19 @@ template(name='notepad')
 
     .menu.z-depth-2
       .octave
-        .label OCTAVE
-        .value #{octave}
-        .controls
-          i.fa.fa-chevron-left
-          i.fa.fa-chevron-right
+        .label OCTAVE &nbsp; #{octave}
+        p.range-field
+          input(type='range' min='0' max='5', value='{{octave}}')
 
-      .rootnote
-        .label ROOTNOTE
-        .value #{rootnote}
-        .controls
-          i.fa.fa-chevron-left
-          i.fa.fa-chevron-right
+      .root-note
+        .label ROOTNOTE &nbsp; #{rootNote}
+        p.range-field
+          input(type='range' min='0' max='11', value='{{rootNoteValue}}')
 
-      .waveshape
-        .label WAVESHAPE
-        .value #{waveshape}
-        .controls
-          i.fa.fa-chevron-left
-          i.fa.fa-chevron-right
+      .wave-shape
+        .label #{waveShape}
+        p.range-field
+          input(type='range' min='0' max='3', value='{{waveShapeValue}}')
 
     canvas#reveal-layer.notepad.z-depth-2
     canvas#touch-layer.notepad.z-depth-3

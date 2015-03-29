@@ -36,6 +36,11 @@ template(name='notepad')
         p.range-field
           input#waveShape(type='range' min='0' max='3', value='{{waveShapeValue}}')
 
+      .delay
+        .label DECAY #{delay}
+        p.range-field
+          input#delay(type='range' min='0' max='100', value='{{delay}}')
+
       .scale
         select
           +each scales

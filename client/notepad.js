@@ -16,6 +16,7 @@ Meteor.startup(function() {
   Session.set('octave',  2);
   Session.set('waveShapes', ['sine', 'triangle', 'sawtooth', 'square']);
   Session.set('waveShape', 2);
+  Session.set('delay', 20);
   Session.set('scales', {
     'Chromatic': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
   , 'Major': [1, 3, 5, 6, 8, 10, 12, 13]
@@ -59,6 +60,10 @@ Template.notepad.helpers({
     return Session.get('waveShape');
   }
 
+, delay: function () {
+    return Session.get('delay');
+  }
+
 , scales: function () {
     var scales = [];
     for (key in Session.get('scales')) {
@@ -86,12 +91,15 @@ Template.notepad.rendered = function() {
 
 var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
+
   // iOS requires user input to trigger audio
   , audioPlaying = false
   , clicking = false
 
   // oscillator
   , oscillator = audioContext.createOscillator()
+  , delay = audioContext.createDelay()
+  , feedback = audioContext.createGain()
   , gain = audioContext.createGain()
 
   // canvas
@@ -119,13 +127,38 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
           ] + Session.get('rootNote')
         );
 
+      feedback.gain.value = Session.get('volume') / 100;
       gain.gain.value = Session.get('volume') / 100;
 
-      console.log(gain.gain.value);
+      console.log(Session.get('delay'));
 
       // temporarily remove top layer
       canvasContext.beginPath();
       canvasContext.clearRect(0, y, canvasContext.canvas.clientWidth, height);
+    }
+
+  , fadeGain = function (gain, speed) {
+      var fader = setInterval(function() {
+        if (gain.gain.value > 0) {
+          gain.gain.value -= 0.01;
+        }
+        else {
+          gain.gain.value = 0;
+          clearInterval(fader);
+        }
+      }, speed);
+    }
+
+  , fadeFeedback = function (feedback, speed) {
+      var fader = setInterval(function() {
+        if (feedback.gain.value > 0) {
+          feedback.gain.value -= 0.01;
+        }
+        else {
+          feedback.gain.value = 0;
+          clearInterval(fader);
+        }
+      }, speed);
     }
 
   , toggleGrid = function (noteHeight) {
@@ -160,7 +193,7 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
   , mouseup = function (event) {
       clicking = false;
-      gain.gain.value = 0;
+      fadeGain(gain, Session.get('delay') / 10);
       drawNotes(Session.get('noteHeight'));
       toggleGrid(Session.get('noteHeight'));
     }
@@ -181,7 +214,7 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
   , touchend = function (event) {
       event.preventDefault();
-      gain.gain.value = 0;
+      fadeGain(gain, Session.get('delay') / 10);
       drawNotes(Session.get('noteHeight'));
       toggleGrid(Session.get('noteHeight'));
     }
@@ -229,17 +262,29 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
   $('.modal-trigger').leanModal();
 
   // initialize audio
-  gain.gain.value = Session.get('volume') / 100;
   oscillator.type = Session.get('waveShapes')[Session.get('waveShape')];
   oscillator.frequency.value = Session.get('baseFrequency'); // value in hertz
+  delay.delayTime.value = Session.get('delay') / 1000;
+  feedback.gain.value = Session.get('volume') / 100;
+  gain.gain.value = Session.get('volume') / 100;
 
-  gain.connect(audioContext.destination);
+  // oscillator.connect(delay);
+  // delay.connect(feedback);
+  // feedback.connect(delay);
+  // delay.connect(gain);
   oscillator.connect(gain);
+  gain.connect(audioContext.destination);
 
   // exposed events
   $('.wave-shape input').change(function() {
     setTimeout(function() {
       oscillator.type = Session.get('waveShapes')[Session.get('waveShape')];
+    }, 0);
+  });
+
+  $('.delay input').change(function() {
+    setTimeout(function() {
+      delay.delayTime.value = Session.get('delay') / 1000
     }, 0);
   });
 

@@ -23,10 +23,10 @@ $fullHeight
 html,
 body
   @extend $fullHeight
+  font-family: 'Bangers', cursive
 
 body
   background-color #2f2f2f
-  font-family: 'Bangers', cursive
 
 .hidden
   display none !important
@@ -93,6 +93,9 @@ header
   +below(small)
     display none
 
+  & *
+    user-select none
+
   input[type=range]
     border none
 
@@ -105,11 +108,14 @@ header
   .thumb
     display none
 
-  & *
-    user-select none
+  .select-wrapper input.select-dropdown
+    color rgb(33, 199, 148)
 
   .label
     transform translateY(10px)
+
+.dropdown-content li > span
+  font-family 'Open Sans', sans-serif
 
 .notepad
   @extend $floatLeft

@@ -15,6 +15,13 @@ Meteor.startup(function() {
   Session.set('octave',  1);
   Session.set('waveShapes', ['sine', 'triangle', 'sawtooth', 'square']);
   Session.set('waveShape', 2);
+  Session.set('scales', {
+    'Chromatic': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+  , 'Major': [1, 3, 5, 6, 8, 10, 12, 13]
+  , 'Minor': [1, 3, 4, 6, 8, 9, 11, 13]
+  , 'Blues': [1, 4, 6, 7, 8, 11, 13]
+  });
+  Session.set('scale', Session.get('scales')['Chromatic']);
 });
 
 Template.notepad.helpers({
@@ -41,6 +48,14 @@ Template.notepad.helpers({
 , waveShapeValue: function () {
     return Session.get('waveShape');
   }
+
+, scales: function () {
+    var scales = [];
+    for (key in Session.get('scales')) {
+      scales.push(key);
+    }
+    return scales;
+  }
 });
 
 Template.notepad.events({
@@ -54,6 +69,12 @@ Template.notepad.events({
 
 , 'mousedown .wave-shape input, mousemove .wave-shape input': function (event) {
     Session.set('waveShape', +event.target.value);
+  }
+
+, 'change .scale': function (event) {
+    var scale = Session.get('scales')[event.target.value];
+    Session.set('scale', scale);
+    Session.set('noteHeight', scale.length);
   }
 });
 
@@ -88,10 +109,18 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
       oscillator.frequency.value =
         getFrequency(
           Session.get('baseFrequency') * Math.pow(2, Session.get('octave'))
-        , flipSetPosition(Math.floor(y / height), 0, 12) + Session.get('rootNote')
+        , Session.get('scale')[
+            flipSetPosition(Math.floor(y / height), 0, 12)
+            + Session.get('rootNote') - flipSetPosition(Session.get('noteHeight'), 0, 12) - 1
+          ]
         );
 
-      console.log(Session.get('rootNote'));
+      console.log(
+        Session.get('scale')[
+          flipSetPosition(Math.floor(y / height), 0, 12)
+          + Session.get('rootNote') - flipSetPosition(Session.get('noteHeight'), 0, 12) - 1
+        ]
+      )
       gain.gain.value = 1;
 
       // temporarily remove top layer
@@ -190,6 +219,12 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
   // exposed variables
   $('.wave-shape input').change(setWaveShape);
+  $('select').change(function() {
+    setTimeout(function() {
+      drawNotes(Session.get('noteHeight'));
+      toggleGrid(Session.get('noteHeight'));
+    }, 0);
+  });
 
   // initialize canvas
   notepad.width = canvasContext.canvas.clientWidth;
@@ -198,6 +233,9 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
   drawNotes(Session.get('noteHeight'));
   toggleGrid(Session.get('noteHeight'));
   $('#reveal-layer').show();
+
+  // initialize material design
+  $('select').material_select();
 
   // initialize audio
   gain.gain.value = 0;

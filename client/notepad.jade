@@ -41,5 +41,10 @@ template(name='notepad')
         p.range-field
           input(type='range' min='0' max='3', value='{{waveShapeValue}}')
 
+      .scale
+        select
+          +each scales
+            option(value='{{this}}') #{this}
+
     canvas#reveal-layer.notepad.z-depth-2
     canvas#touch-layer.notepad.z-depth-3

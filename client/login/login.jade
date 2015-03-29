@@ -1,0 +1,25 @@
+template(name='login')
+  #signIn.modal
+    .modal-content
+      h4 Sign In
+
+      form.sign-in
+        .input-field
+          input#username(type='text')
+          label(for='username') username
+
+        .input-field
+          input#password(type='password')
+          label(for='password') password
+
+  #signUp.modal
+    .modal-content
+      h4 Sign up with
+      i.fa.fa-3x.fa-github
+      i.fa.fa-3x.fa-facebook
+      i.fa.fa-3x.fa-google
+
+  header
+    .login-buttons
+      a.modal-trigger(href='#signIn') Sign In
+      a.modal-trigger(href='#signUp') Sign Up

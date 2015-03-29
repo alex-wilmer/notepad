@@ -47,7 +47,7 @@ header
 .login-buttons > *
   transition all 0.3s ease
 
-[class^='sign']
+.login-buttons
   display inline-block
   cursor pointer
   color #a8f5cb
@@ -55,10 +55,10 @@ header
   font-size 0.8em
   transition color 0.3s ease
 
-.login-buttons > * > *:hover
+.login-buttons > *:hover
   color white
 
-.login-buttons > * > * + *
+.login-buttons > * + *
   margin-left 20px
 
 .wrapper
@@ -114,8 +114,27 @@ header
   .label
     transform translateY(10px)
 
+.dropdown-content
+  max-height 220px
+
+.dropdown-content li
+  line-height 0.7
+  font-size 1 rem
+
+.modal-content,
 .dropdown-content li > span
   font-family 'Open Sans', sans-serif
+
+  .fa
+    cursor pointer
+    transition color 0.3s ease
+
+  .fa:hover
+    color rgb(7, 173, 97)
+
+  .fa + .fa
+    margin-left 20px
+
 
 .notepad
   @extend $floatLeft

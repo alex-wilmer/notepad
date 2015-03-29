@@ -9,37 +9,32 @@ body
   +notepad
 
 template(name='notepad')
-  header
-    .login-buttons
-      #default.shown
-        .sign-in Sign In
-        .sign-up Sign Up
-
-      #sign-in.hidden
-        input(placeholder='username')
-        input(placeholder='password' type='password')
-
-      #sign-up.hidden
+  +login
 
   .wrapper
     .header.z-depth-1
       | NotePad
 
     .menu.z-depth-2
+      .volume
+        .label VOLUME &nbsp; #{volume}
+        p.range-field
+          input#volume(type='range' min='0' max='100', value='{{volume}}')
+
       .octave
         .label OCTAVE &nbsp; #{octave}
         p.range-field
-          input(type='range' min='0' max='5', value='{{octave}}')
+          input#octave(type='range' min='0' max='5', value='{{octave}}')
 
       .root-note
         .label ROOTNOTE &nbsp; #{rootNote}
         p.range-field
-          input(type='range' min='0' max='11', value='{{rootNoteValue}}')
+          input#rootNote(type='range' min='0' max='11', value='{{rootNoteValue}}')
 
       .wave-shape
         .label #{waveShape}
         p.range-field
-          input(type='range' min='0' max='3', value='{{waveShapeValue}}')
+          input#waveShape(type='range' min='0' max='3', value='{{waveShapeValue}}')
 
       .scale
         select

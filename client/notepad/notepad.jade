@@ -49,14 +49,8 @@ template(name='notepad')
           i.mdi-av-queue-music
 
       .leds
-        .led-blue.active
-        .led-blue
-        .led-blue
-        .led-blue
-        .led-blue
-        .led-blue
-        .led-blue
-        .led-blue
+        +each bars
+          .led-blue
 
       span.title NotePad
 
@@ -100,15 +94,12 @@ template(name='notepad')
 
     .second-menu.menu(class='{{active}}')
       .tempo
-        .label BPM #{tempo}
+        .label BPM #{bpm}
         p.range-field
-          input#tempo(type='range' min='60' max='2000', value='{{tempo}}')
+          input#tempo(type='range' min='600' max='2000', value='{{tempo}}')
 
       a#playChordProgressionButton.waves-effect.waves-light.btn(disabled='true')
-        i.mdi-av-stop
-      
-      a#stopChordProgressionButton.waves-effect.waves-light.btn(disabled='true')
-        i.mdi-av-stop
+        i.mdi-av-play-arrow
 
     canvas#reveal-layer.notepad.z-depth-2
     canvas#touch-layer.notepad.z-depth-3

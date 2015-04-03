@@ -91,6 +91,14 @@ Template.notepad.helpers({
 , tempo: function() {
     return Session.get('tempo');
   }
+
+, bpm: function() {
+    return flipSetPosition(Math.floor(Session.get('tempo') / 10), 60, 200);
+  }
+
+, bars: function() {
+    return Session.get('chordProgression');
+  }
 });
 
 Template.notepad.events({
@@ -136,7 +144,8 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
   , gain = audioContext.createGain()
 
 
-
+  , intervalId
+  , playing = false
 
 
   // ED'S VARIABLES
@@ -453,8 +462,7 @@ function playSound(buffer, when, offset, duration) {
   var source = audioContext.createBufferSource();
   source.buffer = buffer;
   //source.loop = true;
-  console.log(audioContext.currentTime);
-    source.connect(audioContext.destination);
+  source.connect(audioContext.destination);
   source.start(when, offset, duration);
   return source;
 }
@@ -467,23 +475,45 @@ function playChordProgression() {
   for (var x = 0, len = chordProgression.length; x < len; x++) {
     chordsToPlay.push(generateChord(chordProgression[x], Session.get('key'), Session.get('mode')));
   }
-  //for (var loopCount = 1; loopCount < 50; loopCount++) {
-    for (var bar = 0; bar < chordsToPlay.length; bar++){
-      for (var x = 0, len = chordsToPlay[bar].length; x < len; x++) {
-        var time = audioContext.currentTime;
-        soundsCurrentlyPlaying.push(
-          playSound(
-            noteSamples[chordsToPlay[bar][x]]
-          , time + (tempo / 1000) * bar
-          , 0
-          , tempo / 1000
-          )
-        );
+  var currentBar = 0;
+  $('.led-blue').removeClass('active');
+  $($('.led-blue')[currentBar++]).addClass('active');
+
+  if (!playing) {
+    intervalId = setInterval(function() {
+      currentBar =
+        currentBar === chordProgression.length
+        ? 0
+        : currentBar;
+      if (currentBar === 0) {
+        playChordProgression();
       }
+      $('.led-blue').removeClass('active');
+      $($('.led-blue')[currentBar++]).addClass('active');
+    }, tempo);
+  }
+
+  playing = true;
+  //for (var loopCount = 1; loopCount < 50; loopCount++) {
+  for (var bar = 0; bar < chordsToPlay.length; bar++){
+    for (var x = 0, len = chordsToPlay[bar].length; x < len; x++) {
+      var time = audioContext.currentTime;
+      soundsCurrentlyPlaying.push(
+        playSound(
+          noteSamples[chordsToPlay[bar][x]]
+        , time + (tempo / 1000) * bar
+        , 0
+        , tempo / 1000
+        )
+      );
     }
+  }
 }
 
 function stopChordProgression() {
+  clearInterval(intervalId);
+  $('.led-blue').removeClass('active');
+  playing = false;
   for (var x in soundsCurrentlyPlaying) {
     soundsCurrentlyPlaying[x].stop();
   }
@@ -492,20 +522,11 @@ function stopChordProgression() {
   //nextChordProgression = {};
 }
 
-
-
-
-
-
 /*
 //
 //  END OF ED'S STUFF
 //
-//
-//
-//
 */
-
 
   // hookup event handlers
   notepad.addEventListener('mousedown', mousedown, false);
@@ -563,10 +584,6 @@ function stopChordProgression() {
     }, 0);
   });
 
-
-
-
-
   //ED'S STUFF INITIALIZATION
   var bufferLoader;
   var soundFilesArray = [];
@@ -592,16 +609,17 @@ function stopChordProgression() {
   });
 
   $("#playChordProgressionButton").click(function(){
-    if (! soundsCurrentlyPlaying.length > 0) {
-      playChordProgression();
-      //$("#playChordProgressionButton").attr("disabled", true);
+    if (!playing) {
+      $(this).html('<i class="mdi-av-stop"></i>');
+      if (! soundsCurrentlyPlaying.length > 0) {
+        playChordProgression();
+      }
     }
+
+    else {
+      $(this).html('<i class="mdi-av-play-arrow"></i>');
+      stopChordProgression();
+    }
+
   });
-
-  $("#stopChordProgressionButton").click(function(){
-    stopChordProgression();
-    //$("#playChordProgressionButton").removeAttr("disabled");
-  });
-
-
 }

@@ -30,6 +30,7 @@ Meteor.startup(function() {
   , 'Whole Tone': [1, 3, 5, 7, 9, 11, 13]
   });
   Session.set('scale', Session.get('scales')['Chromatic']);
+  Session.set('degrees', ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII']);
 });
 
 Template.notepad.helpers({
@@ -135,6 +136,8 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
           - flipSetPosition(Session.get('noteHeight'), 0, 12) - 1
           ] + Session.get('rootNote')
         );
+
+      console.log(oscillator.frequency.value);
 
       feedback.gain.value = Session.get('volume') / 100;
       gain.gain.value = Session.get('volume') / 100;
@@ -242,6 +245,56 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
           (event.targetTouches[0].pageY - $('#touch-layer').offset().top) / noteY
         );
       playNote(noteY * clickedNote, noteY);
+    }
+
+  , generateChord = function (chord, key, mode) {
+      var keyNumber = notesArray.indexOf(key.note)
+    		, numericChordNumber
+    		, mode = generateMode(key, mode)
+    		, chordType = ""	//maj7, aug, etc
+    		, result = [];
+
+  		//scan through the chord string until additional note characters (ie: 7, aug, min7) are either found or not
+  		for (var x = 0; x < chord.length; x++) {
+  			if (!(/[IiVv]/.test(chord[x]))) {
+  				chordType = chord.slice(x);
+  				chord = chord.slice(0, x);
+  				break;
+  			}
+  		}
+
+  		//do some string-matching to figure out which roman numeral the chord is
+  		//get the index of that numeral in numericChordsArray
+  		for (var x in numericChordsArray) {
+  			if (chord.indexOf(numericChordsArray[x]) >= 0) {
+  				if (chord.length == numericChordsArray[x].length) {
+  					numericChordNumber = x;
+  				}
+  			}
+  		}
+
+  		//if the chord wasn't weird, assign it either major or minor
+  		if (chordType === '') {
+  			chordType = (numericChordNumber < 7) ? 'maj' : 'min';
+  		}
+
+  		//if it's a minor chord, fix up a problem with assigning the min7 chord, if applicable
+  		//then, prep numericChordNumber for the big push
+  		if (numericChordNumber >= 7) {
+  			if (chordType == '7') {
+  				chordType = 'min7';
+  			}
+  			numericChordNumber -= 7;
+  		}
+
+  		//add every note in the generated chord to result
+  		//factor in the mode to get the correct notes (otherwise every chord will be a root chord)
+  		//(the mode already factored in the key when it was generated)
+  		for (var x in chordsArrays[chordType]) {
+  			result.push(notesArray[chordsArrays[chordType][x] + notesArray.indexOf(mode[numericChordNumber])]);
+  		}
+
+  		return result;
     };
 
   // hookup event handlers

@@ -30,11 +30,7 @@ Meteor.startup(function() {
   , 'Whole Tone': [1, 3, 5, 7, 9, 11, 13]
   });
   Session.set('scale', Session.get('scales')['Chromatic']);
-<<<<<<< HEAD
   Session.set('degrees', ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII']);
-=======
-
-
 
   //ED'S STUFF
   Session.set('tempo', 1000);
@@ -50,9 +46,6 @@ Meteor.startup(function() {
   Session.set('chordProgression', Session.get("chordProgressions")["12-Bar Blues"]);
   Session.set('mode', "Major"); //work this into scales
 
-
-
->>>>>>> 297dae6b13c7cd77abda827e357a407ca2ccba2d
 });
 
 Template.notepad.helpers({

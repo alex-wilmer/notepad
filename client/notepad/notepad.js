@@ -108,6 +108,15 @@ Template.notepad.events({
 
 , 'change .switch input': function (event) {
     Session.set('secondMenu', Session.get('secondMenu') === '' ? 'active' : '');
+    if (Session.get('secondMenu') === 'active') {
+      $('.second-menu').css('opacity', 1)
+    }
+
+    else {
+      setTimeout(function() {
+        $('.second-menu').css('opacity', 0);
+      }, 700);
+    }
   }
 });
 
@@ -435,7 +444,8 @@ function bufferCallback(bufferList){
   for (var x = 0, len = bufferList.length; x < len; x++) {
     noteSamples[notesArray[x]] = bufferList[x];
   }
-  $("#playChordProgressionButton").html("Play").removeAttr("disabled");
+  $("#playChordProgressionButton")
+    .html('<i class="mdi-av-play-arrow"></i>').removeAttr("disabled");
   $("#stopChordProgressionButton").removeAttr("disabled");
 }
 

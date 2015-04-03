@@ -48,6 +48,16 @@ template(name='notepad')
           span.lever
           i.mdi-av-queue-music
 
+      .leds
+        .led-blue.active
+        .led-blue
+        .led-blue
+        .led-blue
+        .led-blue
+        .led-blue
+        .led-blue
+        .led-blue
+
       span.title NotePad
 
     .first-menu.menu.z-depth-2
@@ -94,8 +104,11 @@ template(name='notepad')
         p.range-field
           input#tempo(type='range' min='60' max='2000', value='{{tempo}}')
 
-      button#playChordProgressionButton(disabled='true') Loading
-      button#stopChordProgressionButton(disabled='true') Stop
+      a#playChordProgressionButton.waves-effect.waves-light.btn(disabled='true')
+        i.mdi-av-stop
+      
+      a#stopChordProgressionButton.waves-effect.waves-light.btn(disabled='true')
+        i.mdi-av-stop
 
     canvas#reveal-layer.notepad.z-depth-2
     canvas#touch-layer.notepad.z-depth-3

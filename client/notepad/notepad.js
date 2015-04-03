@@ -30,6 +30,8 @@ Meteor.startup(function() {
   , 'Whole Tone': [1, 3, 5, 7, 9, 11, 13]
   });
   Session.set('scale', Session.get('scales')['Chromatic']);
+  Session.set('isRecording', false);
+  Session.set('song', []);
 
 
 
@@ -67,6 +69,10 @@ Template.notepad.helpers({
       return Session.get('notes')[Session.get('rootNote')];
     }
   }
+
+, isRecording: function() {
+  return Sesion.get('isRecording');
+}
 
 , rootNoteValue: function () {
     return Session.get('rootNote');
@@ -227,15 +233,20 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
       }
     }
 
+  , startplaying = function(note) {
+    if (!audioPlaying) {
+      oscillator.start();
+      audioPlaying = true;
+    }
+    alert(isRecording);
+  }
+
   , mousedown = function (event) {
       noteY = notepad.height / Session.get('noteHeight');
       clickedNote = Math.floor(event.offsetY / noteY);
       playNote(noteY * clickedNote, noteY);
       clicking = true;
-      if (!audioPlaying) {
-        oscillator.start();
-        audioPlaying = true;
-      }
+      startplaying();
     }
 
   , mousemove = function (event) {
@@ -261,10 +272,7 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
           (event.targetTouches[0].pageY - $('#touch-layer').offset().top) / noteY
         );
       playNote(noteY * clickedNote, noteY);
-      if (!audioPlaying) {
-        oscillator.start();
-        audioPlaying = true;
-      }
+      startplaying();
     }
 
   , touchend = function (event) {
@@ -540,6 +548,7 @@ function stopChordProgression() {
   $('.modal-trigger').leanModal();
 
   // initialize audio
+  //
   oscillator.type = Session.get('waveShapes')[Session.get('waveShape')];
   oscillator.frequency.value = Session.get('baseFrequency'); // value in hertz
   delay.delayTime.value = Session.get('delay') / 1000;
@@ -586,15 +595,14 @@ function stopChordProgression() {
   bufferLoader = new BufferLoader(audioContext, soundFilesArray, bufferCallback);
   bufferLoader.load();
 
-  $("#playChordProgressionButton").click(function(){
+  $(document).on('touchstart click',"#playChordProgressionButton" , function(event){
     if (! soundsCurrentlyPlaying.length > 0) {
       playChordProgression();
-      //$("#playChordProgressionButton").attr("disabled", true);
     }
   });
+
   $("#stopChordProgressionButton").click(function(){
     stopChordProgression();
-    //$("#playChordProgressionButton").removeAttr("disabled");
   });
 
 

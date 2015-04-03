@@ -89,6 +89,11 @@ template(name='notepad')
           a.waves-effect.waves-light.btn.modal-trigger(class='{{active}}' href='#save') SAVE
 
     .second-menu.menu(class='{{active}}')
+      .tempo
+        .label BPM #{tempo}
+        p.range-field
+          input#tempo(type='range' min='60' max='2000', value='{{tempo}}')
+
       button#playChordProgressionButton(disabled='true') Loading
       button#stopChordProgressionButton(disabled='true') Stop
 

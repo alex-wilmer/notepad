@@ -87,6 +87,10 @@ Template.notepad.helpers({
     }
     return scales;
   }
+
+, tempo: function() {
+    return Session.get('tempo');
+  }
 });
 
 Template.notepad.events({
@@ -131,10 +135,6 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
   , soundsCurrentlyPlaying = []
   , chordsToPlay = []
   , noteSamples = {}
-
-
-
-
 
   // canvas
   , notepad = document.getElementById('touch-layer')
@@ -282,11 +282,11 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
 
   function generateMode(key, mode) {
-  
+
     var notesArray = [
-      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B", 
-      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B", 
-      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B", 
+      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
+      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
+      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
       "C"]
 
       , modesArrays = {
@@ -312,8 +312,8 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
 function generateChord(chord, key, mode) {
   var notesArray = [
-    "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B", 
-    "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B", 
+    "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
+    "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
     "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
     "C"]
     , chordsArrays = {
@@ -439,14 +439,12 @@ function bufferCallback(bufferList){
   $("#stopChordProgressionButton").removeAttr("disabled");
 }
 
-
-
-
-
 function playSound(buffer, when, offset, duration) {
   var source = audioContext.createBufferSource();
   source.buffer = buffer;
-  source.connect(audioContext.destination);
+  //source.loop = true;
+  console.log(audioContext.currentTime);
+    source.connect(audioContext.destination);
   source.start(when, offset, duration);
   return source;
 }
@@ -462,13 +460,17 @@ function playChordProgression() {
   //for (var loopCount = 1; loopCount < 50; loopCount++) {
     for (var bar = 0; bar < chordsToPlay.length; bar++){
       for (var x = 0, len = chordsToPlay[bar].length; x < len; x++) {
-        //if (!chordProgressionIsPlaying) {return;}
         var time = audioContext.currentTime;
-        soundsCurrentlyPlaying.push(playSound(noteSamples[chordsToPlay[bar][x]], time + (tempo / 1000) * bar, 0, tempo / 1000));
+        soundsCurrentlyPlaying.push(
+          playSound(
+            noteSamples[chordsToPlay[bar][x]]
+          , time + (tempo / 1000) * bar
+          , 0
+          , tempo / 1000
+          )
+        );
       }
     }
-  //nextChordProgression = setTimeout(playChordProgression, (time * 1000) + (tempo * chordProgression.length));
-  //}
 }
 
 function stopChordProgression() {
@@ -564,12 +566,22 @@ function stopChordProgression() {
   bufferLoader = new BufferLoader(audioContext, soundFilesArray, bufferCallback);
   bufferLoader.load();
 
+  document.addEventListener('touchstart', function(event) {
+    if (event.target.id === 'playChordProgressionButton') {
+      if (! soundsCurrentlyPlaying.length > 0) {
+        playChordProgression();
+        //$("#playChordProgressionButton").attr("disabled", true);
+      }
+    }
+  });
+
   $("#playChordProgressionButton").click(function(){
     if (! soundsCurrentlyPlaying.length > 0) {
       playChordProgression();
       //$("#playChordProgressionButton").attr("disabled", true);
     }
   });
+
   $("#stopChordProgressionButton").click(function(){
     stopChordProgression();
     //$("#playChordProgressionButton").removeAttr("disabled");
@@ -577,4 +589,3 @@ function stopChordProgression() {
 
 
 }
-

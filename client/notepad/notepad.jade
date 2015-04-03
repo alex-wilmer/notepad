@@ -90,7 +90,14 @@ template(name='notepad')
 
     .second-menu.menu(class='{{active}}')
       button#playChordProgressionButton(disabled='true') Loading
+      
       button#stopChordProgressionButton(disabled='true') Stop
+
+      .chordProgression
+        select 
+          +each chordProgression
+            option(value='{{this}}') #{this}
+
 
     canvas#reveal-layer.notepad.z-depth-2
     canvas#touch-layer.notepad.z-depth-3

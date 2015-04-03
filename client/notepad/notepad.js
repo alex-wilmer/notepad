@@ -37,6 +37,14 @@ Meteor.startup(function() {
   Session.set('tempo', 1000);
   Session.set('key', "C");  //switch this to rootNote eventually?
   Session.set('chordProgression',["I", "I", "I", "I","IV", "IV", "I", "I", "V", "IV", "I", "I"]);
+  Session.set('key', "A");  //switch this to rootNote eventually?
+  Session.set('chordProgressions', {
+    "12-Bar Blues": ["I", "I", "I", "I","IV", "IV", "I", "I", "V", "IV", "I", "I"]
+  , "50s": ["I", "vi", "IV", "V"]
+  , "Circle": ["I", "IV", "viio", "iii", "vi", "ii", "V", "I"]
+  , "Pop-Punk": ["I", "V", "vi", "IV"]
+  });
+  Session.set('chordProgression', Session.get("chordProgressions")["12-Bar Blues"]);
   Session.set('mode', "Major"); //work this into scales
 
 
@@ -92,6 +100,14 @@ Template.notepad.helpers({
     return Session.get('tempo');
   }
 
+, chordProgression: function () {
+    var chords = [];
+    for (key in Session.get('chordProgressions')) {
+      chords.push(key);
+    }
+    return chords;
+  }
+
 , bpm: function() {
     return flipSetPosition(Math.floor(Session.get('tempo') / 10), 60, 200);
   }
@@ -112,6 +128,11 @@ Template.notepad.events({
     var scale = Session.get('scales')[event.target.value];
     Session.set('scale', scale);
     Session.set('noteHeight', scale.length);
+  }
+
+, 'change .chordProgression': function (event) {
+    var chord = Session.get('chordProgressions')[event.target.value];
+    Session.set('chordProgression', chord);
   }
 
 , 'change .switch input': function (event) {
@@ -149,7 +170,7 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
 
   // ED'S VARIABLES
-  , notesArray = ['Ab', 'A', 'Bb', 'B', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G']
+  , notesArray = ['A', 'Bb', 'B', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab']
   , soundsCurrentlyPlaying = []
   , chordsToPlay = []
   , noteSamples = {}
@@ -473,8 +494,7 @@ function playChordProgression() {
   chordsToPlay = [];
   stopChordProgression();
   for (var x = 0, len = chordProgression.length; x < len; x++) {
-    chordsToPlay.push(generateChord(chordProgression[x], Session.get('key'), Session.get('mode')));
-  }
+    chordsToPlay.push(generateChord(chordProgression[x], notesArray[Session.get('rootNote') + 1], Session.get('mode')));  }
   var currentBar = 0;
   $('.led-blue').removeClass('active');
   $($('.led-blue')[currentBar++]).addClass('active');

@@ -30,7 +30,21 @@ Meteor.startup(function() {
   , 'Whole Tone': [1, 3, 5, 7, 9, 11, 13]
   });
   Session.set('scale', Session.get('scales')['Chromatic']);
+<<<<<<< HEAD
   Session.set('degrees', ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII']);
+=======
+
+
+
+  //ED'S STUFF
+  Session.set('tempo', 1000);
+  Session.set('key', "C");  //switch this to rootNote eventually?
+  Session.set('chordProgression',["I", "I", "I", "I","IV", "IV", "I", "I", "V", "IV", "I", "I"]);
+  Session.set('mode', "Major"); //work this into scales
+
+
+
+>>>>>>> 297dae6b13c7cd77abda827e357a407ca2ccba2d
 });
 
 Template.notepad.helpers({
@@ -77,6 +91,18 @@ Template.notepad.helpers({
     }
     return scales;
   }
+
+, tempo: function() {
+    return Session.get('tempo');
+  }
+
+, bpm: function() {
+    return flipSetPosition(Math.floor(Session.get('tempo') / 10), 60, 200);
+  }
+
+, bars: function() {
+    return Session.get('chordProgression');
+  }
 });
 
 Template.notepad.events({
@@ -94,6 +120,15 @@ Template.notepad.events({
 
 , 'change .switch input': function (event) {
     Session.set('secondMenu', Session.get('secondMenu') === '' ? 'active' : '');
+    if (Session.get('secondMenu') === 'active') {
+      $('.second-menu').css('opacity', 1)
+    }
+
+    else {
+      setTimeout(function() {
+        $('.second-menu').css('opacity', 0);
+      }, 700);
+    }
   }
 });
 
@@ -111,6 +146,17 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
   , delay = audioContext.createDelay()
   , feedback = audioContext.createGain()
   , gain = audioContext.createGain()
+
+
+  , intervalId
+  , playing = false
+
+
+  // ED'S VARIABLES
+  , notesArray = ['Ab', 'A', 'Bb', 'B', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G']
+  , soundsCurrentlyPlaying = []
+  , chordsToPlay = []
+  , noteSamples = {}
 
   // canvas
   , notepad = document.getElementById('touch-layer')
@@ -297,6 +343,247 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
   		return result;
     };
 
+
+
+/*
+//  ED'S STUFF
+//
+//
+//
+//
+//
+*/
+
+
+  function generateMode(key, mode) {
+
+    var notesArray = [
+      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
+      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
+      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
+      "C"]
+
+      , modesArrays = {
+        "Major" : [0, 2, 4, 5, 7, 9, 11],
+        "Minor" : [0, 2, 3, 5, 7, 8, 10],
+        "Blues" : [0, 3, 5, 6, 7, 9, 10],
+        "Ionian" : [0, 2, 4, 5, 7, 9, 11],
+        "Dorian" : [2, 4, 5, 7, 9, 11, 12],
+        "Phrygian" : [4, 5, 7, 9, 11, 12, 14],
+        "Lydian" : [5, 7, 9, 11, 12, 14, 16],
+        "Mixolydian" : [7, 9, 11, 12, 14, 16, 17],
+        "Aeolian" : [9, 11, 12, 14, 16, 17, 19],
+        "Locrian" : [11, 12, 14, 16, 17, 19, 21],
+      }
+      , keyNumber = notesArray.indexOf(key)
+      , result = [];
+      ;
+      for (var x in modesArrays[mode]) {
+        result.push(notesArray[modesArrays[mode][x] + keyNumber]);
+      }
+      return result;
+  }
+
+function generateChord(chord, key, mode) {
+  var notesArray = [
+    "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
+    "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
+    "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
+    "C"]
+    , chordsArrays = {
+      "maj": [0, 4, 7],
+      "min": [0, 3, 7],
+      "7": [0, 4, 7, 10],
+      "maj7":  [0, 4, 7, 11],
+      "min7": [0, 3, 7, 10],
+      "dim": [0, 3, 6],
+      "o": [0, 3, 6],
+      "aug": [0, 4, 8],
+      "+": [0, 4, 8],
+      "sus4": [0, 5, 7],
+      "add2": [0, 2, 4, 7]
+    }
+    , numericChordsArray = [
+      "I", "II", "III", "IV", "V", "VI", "VII", "i", "ii", "iii", "iv", "v", "vi", "vii"
+    ]
+    , keyNumber = notesArray.indexOf(key)
+    , numericChordNumber
+    , mode = generateMode(key, mode)
+    , chordType = ""  //maj7, aug, etc
+    , result = []
+    ;
+
+    //scan through the chord string until additional note characters (ie: 7, aug, min7) are either found or not
+    for (var x = 0; x < chord.length; x++) {
+      if (!(/[IiVv]/.test(chord[x]))) {
+        chordType = chord.slice(x);
+        chord = chord.slice(0, x);
+        break;
+      }
+    }
+    //do some string-matching to figure out which roman numeral the chord is
+    //get the index of that numeral in numericChordsArray
+    for (var x in numericChordsArray) {
+      if (chord.indexOf(numericChordsArray[x]) >= 0) {
+        if (chord.length == numericChordsArray[x].length) {
+          numericChordNumber = x;
+        }
+      }
+    }
+    //if the chord wasn't weird, assign it either major or minor
+    if (chordType == "") {
+      chordType = (numericChordNumber < 7) ? "maj" : "min";
+    }
+    //if it's a minor chord, fix up a problem with assigning the min7 chord, if applicable
+    //then, prep numericChordNumber for the big push
+    if (numericChordNumber >= 7) {
+      if (chordType == "7") {
+        chordType = "min7";
+      }
+      numericChordNumber -= 7;
+    }
+    //add every note in the generated chord to result
+    //factor in the mode to get the correct notes (otherwise every chord will be a root chord)
+    //(the mode already factored in the key when it was generated)
+    for (var x in chordsArrays[chordType]) {
+      result.push(notesArray[chordsArrays[chordType][x] + notesArray.indexOf(mode[numericChordNumber])]);
+    }
+    return result;
+  }
+
+
+
+
+
+    function BufferLoader(context, urlList, callback) {
+      this.context = context;
+      this.urlList = urlList;
+      this.onload = callback;
+      this.bufferList = new Array();
+      this.loadCount = 0;
+    }
+
+    //BufferLoader
+    //from HTML5Rocks.com
+
+    BufferLoader.prototype.loadBuffer = function(url, index) {
+      // Load buffer asynchronously
+      var request = new XMLHttpRequest();
+      request.open("GET", url, true);
+      request.responseType = "arraybuffer";
+
+      var loader = this;
+
+      request.onload = function() {
+        // Asynchronously decode the audio file data in request.response
+        loader.context.decodeAudioData(
+          request.response,
+          function(buffer) {
+            if (!buffer) {
+              alert('error decoding file data: ' + url);
+              return;
+            }
+            loader.bufferList[index] = buffer;
+            if (++loader.loadCount == loader.urlList.length)
+              loader.onload(loader.bufferList);
+          },
+          function(error) {
+            console.error('decodeAudioData error', error);
+          }
+        );
+      }
+
+      request.onerror = function() {
+        alert('BufferLoader: XHR error');
+      }
+
+      request.send();
+    }
+
+    BufferLoader.prototype.load = function() {
+      for (var i = 0; i < this.urlList.length; ++i)
+      this.loadBuffer(this.urlList[i], i);
+  }
+
+function bufferCallback(bufferList){
+  for (var x = 0, len = bufferList.length; x < len; x++) {
+    noteSamples[notesArray[x]] = bufferList[x];
+  }
+  $("#playChordProgressionButton")
+    .html('<i class="mdi-av-play-arrow"></i>').removeAttr("disabled");
+  $("#stopChordProgressionButton").removeAttr("disabled");
+}
+
+function playSound(buffer, when, offset, duration) {
+  var source = audioContext.createBufferSource();
+  source.buffer = buffer;
+  //source.loop = true;
+  source.connect(audioContext.destination);
+  source.start(when, offset, duration);
+  return source;
+}
+
+function playChordProgression() {
+  var chordProgression = Session.get('chordProgression');
+  var tempo = Session.get("tempo");
+  chordsToPlay = [];
+  stopChordProgression();
+  for (var x = 0, len = chordProgression.length; x < len; x++) {
+    chordsToPlay.push(generateChord(chordProgression[x], Session.get('key'), Session.get('mode')));
+  }
+  var currentBar = 0;
+  $('.led-blue').removeClass('active');
+  $($('.led-blue')[currentBar++]).addClass('active');
+
+  if (!playing) {
+    intervalId = setInterval(function() {
+      currentBar =
+        currentBar === chordProgression.length
+        ? 0
+        : currentBar;
+      if (currentBar === 0) {
+        playChordProgression();
+      }
+      $('.led-blue').removeClass('active');
+      $($('.led-blue')[currentBar++]).addClass('active');
+    }, tempo);
+  }
+
+  playing = true;
+  //for (var loopCount = 1; loopCount < 50; loopCount++) {
+  for (var bar = 0; bar < chordsToPlay.length; bar++){
+    for (var x = 0, len = chordsToPlay[bar].length; x < len; x++) {
+      var time = audioContext.currentTime;
+      soundsCurrentlyPlaying.push(
+        playSound(
+          noteSamples[chordsToPlay[bar][x]]
+        , time + (tempo / 1000) * bar
+        , 0
+        , tempo / 1000
+        )
+      );
+    }
+  }
+}
+
+function stopChordProgression() {
+  clearInterval(intervalId);
+  $('.led-blue').removeClass('active');
+  playing = false;
+  for (var x in soundsCurrentlyPlaying) {
+    soundsCurrentlyPlaying[x].stop();
+  }
+  soundsCurrentlyPlaying = [];
+  chordsToPlay = [];
+  //nextChordProgression = {};
+}
+
+/*
+//
+//  END OF ED'S STUFF
+//
+*/
+
   // hookup event handlers
   notepad.addEventListener('mousedown', mousedown, false);
   notepad.addEventListener('mousemove', mousemove, false);
@@ -351,5 +638,44 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
       drawNotes(Session.get('noteHeight'));
       toggleGrid(Session.get('noteHeight'));
     }, 0);
+  });
+
+  //ED'S STUFF INITIALIZATION
+  var bufferLoader;
+  var soundFilesArray = [];
+  for (var x = 0, len = notesArray.length; x < len; x++) {
+    soundFilesArray.push("SFX/" + notesArray[x] + ".mp3");
+  }
+  bufferLoader = new BufferLoader(audioContext, soundFilesArray, bufferCallback);
+  bufferLoader.load();
+
+  document.addEventListener('touchstart', function(event) {
+    if (event.target.id === 'playChordProgressionButton') {
+      if (! soundsCurrentlyPlaying.length > 0) {
+        playChordProgression();
+        //$("#playChordProgressionButton").attr("disabled", true);
+      }
+    }
+  });
+
+  document.addEventListener('touchstart', function(event) {
+    if (event.target.id === 'stopChordProgressionButton') {
+      stopChordProgression();
+    }
+  });
+
+  $("#playChordProgressionButton").click(function(){
+    if (!playing) {
+      $(this).html('<i class="mdi-av-stop"></i>');
+      if (! soundsCurrentlyPlaying.length > 0) {
+        playChordProgression();
+      }
+    }
+
+    else {
+      $(this).html('<i class="mdi-av-play-arrow"></i>');
+      stopChordProgression();
+    }
+
   });
 }

@@ -48,6 +48,10 @@ template(name='notepad')
           span.lever
           i.mdi-av-queue-music
 
+      .leds
+        +each bars
+          .led-blue
+
       span.title NotePad
 
     .first-menu.menu.z-depth-2
@@ -89,7 +93,13 @@ template(name='notepad')
           a.waves-effect.waves-light.btn.modal-trigger(class='{{active}}' href='#save') SAVE
 
     .second-menu.menu(class='{{active}}')
-      +whatever
+      .tempo
+        .label BPM #{bpm}
+        p.range-field
+          input#tempo(type='range' min='600' max='2000', value='{{tempo}}')
+
+      a#playChordProgressionButton.waves-effect.waves-light.btn(disabled='true')
+        i.mdi-av-play-arrow
 
     canvas#reveal-layer.notepad.z-depth-2
     canvas#touch-layer.notepad.z-depth-3

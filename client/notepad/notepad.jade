@@ -89,6 +89,8 @@ template(name='notepad')
           a.waves-effect.waves-light.btn.modal-trigger(class='{{active}}' href='#save') SAVE
 
     .second-menu.menu(class='{{active}}')
+      button#playChordProgressionButton(disabled='true') Loading
+      button#stopChordProgressionButton(disabled='true') Stop
 
     canvas#reveal-layer.notepad.z-depth-2
     canvas#touch-layer.notepad.z-depth-3

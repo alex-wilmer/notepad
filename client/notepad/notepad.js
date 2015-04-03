@@ -575,6 +575,12 @@ function stopChordProgression() {
     }
   });
 
+  document.addEventListener('touchstart', function(event) {
+    if (event.target.id === 'stopChordProgressionButton') {
+      stopChordProgression();
+    }
+  });
+
   $("#playChordProgressionButton").click(function(){
     if (! soundsCurrentlyPlaying.length > 0) {
       playChordProgression();

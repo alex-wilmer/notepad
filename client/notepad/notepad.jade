@@ -48,6 +48,13 @@ template(name='notepad')
           span.lever
           i.mdi-av-queue-music
 
+      .transport
+        a#record.waves-effect.waves-light.btn.red
+          i.mdi-image-lens
+
+        a#playChordProgressionButton.waves-effect.waves-light.btn(disabled='true')
+          i.mdi-av-play-arrow
+
       .leds
         +each bars
           .led-blue
@@ -98,8 +105,10 @@ template(name='notepad')
         p.range-field
           input#tempo(type='range' min='600' max='2000', value='{{tempo}}')
 
-      a#playChordProgressionButton.waves-effect.waves-light.btn(disabled='true')
-        i.mdi-av-play-arrow
+      .chordProgression
+        select
+          +each chordProgression
+            option(value='{{this}}') #{this}
 
     canvas#reveal-layer.notepad.z-depth-2
     canvas#touch-layer.notepad.z-depth-3

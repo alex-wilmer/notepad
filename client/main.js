@@ -56,7 +56,7 @@ Template.notepad.rendered = function() {
     , chordsToPlay = []
     , noteSamples = {}
 
-    // canvas
+    // Canvas
     , notepad = document.getElementById('touch-layer')
     , canvasContext = notepad.getContext('2d')
 
@@ -70,6 +70,18 @@ Template.notepad.rendered = function() {
         }
       }
 
+    , toggleGrid = function (noteHeight) {
+        for (var i = 1; i < noteHeight; i++) {
+          canvasContext.beginPath();
+          canvasContext.moveTo(0, i * (notepad.height / noteHeight));
+          canvasContext.lineTo(
+            canvasContext.canvas.clientWidth, i * (notepad.height / noteHeight)
+          );
+          canvasContext.stroke();
+        }
+      }
+
+    // Oscillator
     , playNote = function (y, height) {
         // audio
         oscillator.frequency.value =
@@ -102,17 +114,7 @@ Template.notepad.rendered = function() {
         }, speed);
       }
 
-    , toggleGrid = function (noteHeight) {
-        for (var i = 1; i < noteHeight; i++) {
-          canvasContext.beginPath();
-          canvasContext.moveTo(0, i * (notepad.height / noteHeight));
-          canvasContext.lineTo(
-            canvasContext.canvas.clientWidth, i * (notepad.height / noteHeight)
-          );
-          canvasContext.stroke();
-        }
-      }
-
+    // Event Handlers
     , mousedown = function (event) {
         noteY = notepad.height / Session.get('noteHeight');
         clickedNote = Math.floor(event.offsetY / noteY);
@@ -176,102 +178,113 @@ Template.notepad.rendered = function() {
             (event.targetTouches[0].pageY - $('#touch-layer').offset().top) / noteY
           );
         playNote(noteY * clickedNote, noteY);
-      };
-
-/*
-//  ED'S STUFF
-//
-*/
-
-  function generateMode(key, mode) {
-
-    var notes = Session.get('notes').concat(Session.get('notes'))
-      , keyNumber = notes.indexOf(key)
-      , result = []
-      , modes = {
-          'Ionian': [0, 2, 4, 5, 7, 9, 11]
-        };
-
-      for (var i = 0; i < modes[mode].length; i += 1) {
-        result.push(notes[modes[mode][i]]);
       }
 
-      return result;
-  }
+    // Chords
+    , generateMode = function (key, mode) {
+        var notes = Session.get('notes').concat(Session.get('notes'))
+          , result = []
+          , modes = {
+              'Ionian': [0, 2, 4, 5, 7, 9, 11]
+            };
 
-  function generateChord(chord, key, mode) {
-
-    var notes = Session.get('notes').concat(Session.get('notes'))
-      , chords = {
-          'maj': [0, 4, 7]
-        , 'min': [0, 3, 7]
-        , '7': [0, 4, 7, 10]
-        , 'maj7':  [0, 4, 7, 11]
-        , 'min7': [0, 3, 7, 10]
-        , 'dim': [0, 3, 6]
-        , 'o': [0, 3, 6]
-        , 'aug': [0, 4, 8]
-        , '+': [0, 4, 8]
-        , 'sus4': [0, 5, 7]
-        , 'add2': [0, 2, 4, 7]
+        for (var i = 0; i < modes[mode].length; i += 1) {
+          result.push(notes[modes[mode][i] + notes.indexOf(key)]);
         }
-      , numericChords = [
-        'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'
-      , 'i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'
-      ]
-      , numericChordNumber
-      , mode = generateMode(key, mode)
-      , chordType = ''  //maj7, aug, etc
-      , result = [];
 
-    //scan through the chord string until additional note characters (ie: 7, aug, min7) are either found or not
-    for (var i = 0; i < chord.length; i++) {
-      if (! (/[IiVv]/.test(chord[i]))) {
-        chordType = chord.slice(i);
-        chord = chord.slice(0, i);
-        break;
+        return result;
       }
-    }
-    //do some string-matching to figure out which roman numeral the chord is
-    //get the index of that numeral in numericChordsArray
-    numericChords.forEach(function (numericChord, index) {
-      if (chord.indexOf(numericChord) >= 0) {
-        if (chord.length === numericChord.length) {
-          numericChordNumber = index;
+
+    , generateChord = function (chord, key, mode) {
+
+        var notes = Session.get('notes').concat(Session.get('notes'))
+          , chords = {
+              'maj': [0, 4, 7]
+            , 'min': [0, 3, 7]
+            , '7': [0, 4, 7, 10]
+            , 'maj7': [0, 4, 7, 11]
+            , 'min7': [0, 3, 7, 10]
+            , 'dim': [0, 3, 6]
+            , 'o': [0, 3, 6]
+            , 'aug': [0, 4, 8]
+            , '+': [0, 4, 8]
+            , 'sus4': [0, 5, 7]
+            , 'add2': [0, 2, 4, 7]
+            }
+          , numericChords = [
+              'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'
+            , 'i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'
+            ]
+          , numericChordNumber
+          , mode = generateMode(key, mode)
+          , chordType = ''  //maj7, aug, etc
+          , result = [];
+
+        //scan through the chord string until additional note characters (ie: 7, aug, min7) are either found or not
+        for (var i = 0; i < chord.length; i++) {
+          if (! (/[IiVv]/.test(chord[i]))) {
+            chordType = chord.slice(i);
+            chord = chord.slice(0, i);
+            break;
+          }
         }
+        //do some string-matching to figure out which roman numeral the chord is
+        //get the index of that numeral in numericChordsArray
+        numericChords.forEach(function (numericChord, index) {
+          if (chord.indexOf(numericChord) >= 0) {
+            if (chord.length === numericChord.length) {
+              numericChordNumber = index;
+            }
+          }
+        });
+        //if the chord wasn't weird, assign it either major or minor
+        if (!chordType) {
+          chordType = (numericChordNumber < 7) ? 'maj' : 'min';
+        }
+        //if it's a minor chord, fix up a problem with assigning the min7 chord, if applicable
+        //then, prep numericChordNumber for the big push
+        if (numericChordNumber >= 7) {
+          chordType = chordType === '7' ? 'min7': chordType;
+          numericChordNumber -= 7;
+        }
+        //add every note in the generated chord to result
+        //factor in the mode to get the correct notes (otherwise every chord will be a root chord)
+        //(the mode already factored in the key when it was generated)
+        for (var i = 0; i < chords[chordType].length; i += 1) {
+          result.push(
+            notes[chords[chordType][i] + notes.indexOf(mode[numericChordNumber])]
+          );
+        }
+        return result;
       }
-    });
-    //if the chord wasn't weird, assign it either major or minor
-    if (!chordType) {
-      chordType = (numericChordNumber < 7) ? 'maj' : 'min';
-    }
-    //if it's a minor chord, fix up a problem with assigning the min7 chord, if applicable
-    //then, prep numericChordNumber for the big push
-    if (numericChordNumber >= 7) {
-      chordType = chordType === '7' ? 'min7': chordType;
-      numericChordNumber -= 7;
-    }
-    //add every note in the generated chord to result
-    //factor in the mode to get the correct notes (otherwise every chord will be a root chord)
-    //(the mode already factored in the key when it was generated)
-    for (var char in chords[chordType]) {
-      result.push(
-        notes[chords[chordType][char] + notes.indexOf(mode[numericChordNumber])]
-      );
-    }
-    return result;
-  }
 
-  function BufferLoader(context, urlList, callback) {
-    this.context = context;
-    this.urlList = urlList;
-    this.onload = callback;
-    this.bufferList = new Array();
-    this.loadCount = 0;
-  }
+    , bufferCallback = function (bufferList) {
+        for (var x = 0, len = bufferList.length; x < len; x++) {
+          noteSamples[Session.get('notes')[x]] = bufferList[x];
+        }
+        $('#playChordProgressionButton')
+          .html('<i class="mdi-av-play-arrow"></i>').removeAttr('disabled');
+        $('#stopChordProgressionButton').removeAttr('disabled');
+      }
 
-  //BufferLoader
-  //from HTML5Rocks.com
+    , soundFiles = (function() {
+        var result = [];
+        for (var i = 0; i < 12; i += 1) {
+          result.push('SFX/note' + i + '.mp3');
+        }
+        return result;
+      }())
+
+    , BufferLoader = function (context, urlList, callback) {
+        this.context = context;
+        this.urlList = urlList;
+        this.onload = callback;
+        this.bufferList = new Array();
+        this.loadCount = 0;
+      }
+
+    , bufferLoader =
+        new BufferLoader(audioContext, soundFiles, bufferCallback);
 
   BufferLoader.prototype.loadBuffer = function(url, index) {
     // Load buffer asynchronously
@@ -310,15 +323,6 @@ Template.notepad.rendered = function() {
   BufferLoader.prototype.load = function() {
     for (var i = 0; i < this.urlList.length; ++i)
     this.loadBuffer(this.urlList[i], i);
-  }
-
-  function bufferCallback(bufferList){
-    for (var x = 0, len = bufferList.length; x < len; x++) {
-      noteSamples[Session.get('notes')[x]] = bufferList[x];
-    }
-    $('#playChordProgressionButton')
-      .html('<i class="mdi-av-play-arrow"></i>').removeAttr('disabled');
-    $('#stopChordProgressionButton').removeAttr('disabled');
   }
 
   function playSound(buffer, when, offset, duration) {
@@ -380,13 +384,7 @@ Template.notepad.rendered = function() {
     }
     soundsCurrentlyPlaying = [];
     chordsToPlay = [];
-    //nextChordProgression = {};
   }
-
-/*
-//  END OF ED'S STUFF
-//
-*/
 
   // hookup event handlers
   notepad.addEventListener('mousedown', mousedown, false);
@@ -434,15 +432,8 @@ Template.notepad.rendered = function() {
     }, 0);
   });
 
-  //ED'S STUFF INITIALIZATION
-  var bufferLoader
-    , soundFilesArray = [];
 
-  for (var i = 0; i < 12; i += 1) {
-    soundFilesArray.push('SFX/note' + i + '.mp3');
-  }
-
-  bufferLoader = new BufferLoader(audioContext, soundFilesArray, bufferCallback);
+  // Load chord audio files
   bufferLoader.load();
 
   document.addEventListener('touchstart', function(event) {

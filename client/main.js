@@ -31,6 +31,8 @@ Template.notepad.rendered = function() {
   , 'Pop-Punk': ['I', 'V', 'vi', 'IV']
   , 'Jazzy': ['imin7', 'Vmaj7', 'iio', 'V7']
   , 'Airy': ['Imaj7', 'IVmaj7']
+  , '8 bar blues': ['I', 'V7', 'IV7', 'IV7', 'I', 'V7', 'I', 'V7']
+  , 'Jazz TurnARound': ['I', 'VI', 'II', 'V', 'I', 'V', 'II', 'V']
   });
   Session.set('chordProgression', Session.get('chordProgressions')['12-Bar Blues']);
   Session.set('mode', 'Ionian');

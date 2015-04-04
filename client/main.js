@@ -36,6 +36,10 @@ Template.notepad.rendered = function() {
   });
   Session.set('chordProgression', Session.get('chordProgressions')['12-Bar Blues']);
   Session.set('mode', 'Ionian');
+  Session.set('isRecording', false);
+  Session.set('song', []);
+  Session.set('heldNote', false);
+
 
   var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
@@ -113,6 +117,21 @@ Template.notepad.rendered = function() {
           }
         }, speed);
       }
+      
+    , addNewNote = function(note) {
+          var song = Session.get('song');
+          var currentTime = audioContext.currentTime;
+          var start = _.first(_.filter(song, function(elem) { return elem.type === 'start'; })).time;
+          var offset = currentTime - start;
+          var lastNote = _.last(song));
+          if(Session.set('heldNote') === true) {
+            var noteOffSet = currentTime - lastNote.time;
+            lastNote.duration = noteOffSet;
+            _.last(song)
+          }
+          song.push( { 'type' : 'note', 'value' : note, 'time' : offset } );
+          Session.set('song', song);
+    }
 
     // Event Handlers
     , mousedown = function (event) {
@@ -120,6 +139,7 @@ Template.notepad.rendered = function() {
         clickedNote = Math.floor(event.offsetY / noteY);
         playNote(noteY * clickedNote, noteY);
         clicking = true;
+        addNewNote(clickedNote);
         if (!audioPlaying) {
           oscillator.start();
           audioPlaying = true;
@@ -130,6 +150,8 @@ Template.notepad.rendered = function() {
         if (clicking) {
           noteY = notepad.height / Session.get('noteHeight');
           clickedNote = Math.floor(event.offsetY / noteY);
+          Session.set('heldNote', true);
+          addNewNote(clickedNote);
           playNote(noteY * clickedNote, noteY);
         }
       }
@@ -148,6 +170,7 @@ Template.notepad.rendered = function() {
           Math.floor(
             (event.targetTouches[0].pageY - $('#touch-layer').offset().top) / noteY
           );
+        addNewNote(clickedNote);
         playNote(noteY * clickedNote, noteY);
         if (!audioPlaying) {
           oscillator.start();
@@ -177,6 +200,8 @@ Template.notepad.rendered = function() {
           Math.floor(
             (event.targetTouches[0].pageY - $('#touch-layer').offset().top) / noteY
           );
+        Session.set('heldNote', true);
+        addNewNote(clickedNote);
         playNote(noteY * clickedNote, noteY);
       }
 
@@ -405,6 +430,29 @@ Template.notepad.rendered = function() {
         playChordProgression();
       }
     }
+  });
+  
+  $(document).on('touchstart click',"#playChordProgressionButton" , function(event){
+    if (! soundsCurrentlyPlaying.length > 0) {
+      var isRecording = (Session.get('isRecording'));
+      if(isRecording) {
+        var song = Session.get('song');
+        var startTime = _.first(song).time;
+        var offset = audioContext.currentTime - startTime;
+        song.push( { 'type' : 'startBackground', 'offset' : offset } );
+        Session.set('song', song);
+      }
+      playChordProgression();
+    }
+  });
+
+  $(document).on('touchstart click', "#recordButton", function(event) {
+    Session.set('isRecording', true);
+    var song = Session.get('song');
+    var currentTime = audioContext.currentTime;
+    song.push({ 'type' : 'start', 'time' : currentTime });
+    Session.set('song', song)
+    $("#recordButton").html('...');
   });
 
   $('#playChords').click(function(){

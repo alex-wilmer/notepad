@@ -9,6 +9,9 @@ global-reset()
 small = 700px
 menuWidth = 200px
 
+.purple
+  background-color #A62665 !important
+
 $center
   position relative
   top 50%
@@ -159,6 +162,9 @@ body
   .label
     transform translateY(10px)
 
+.waves-effect
+  z-index 0
+
 .file
   text-align center
 
@@ -173,11 +179,22 @@ body
     background-color #A62665
 
 .second-menu
+  color #F75AA7
   position absolute
   transform translateX(100%)
   transition transform 0.4s ease
   background-color #322831
   opacity 0
+
+  .select-wrapper input.select-dropdown,
+  .dropdown-content li > a, .dropdown-content li > span
+    color #F75AA7
+
+  input[type=range]::-webkit-slider-thumb
+    background-color #F75AA7
+
+  input[type=range]::-moz-range-thumb
+    background #F75AA7
 
 .tempo .range-field
   transform rotate(180deg)
@@ -210,7 +227,6 @@ body
 
   .fa + .fa
     margin-left 20px
-
 
 .notepad
   @extend $floatLeft

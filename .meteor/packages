@@ -16,3 +16,5 @@ accounts-base
 accounts-password
 accounts-github
 service-configuration
+coffeescript
+iron:router

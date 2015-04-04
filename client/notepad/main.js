@@ -1,158 +1,6 @@
-// Pure Functions
-var flipSetPosition = function (n, first, last) {
-      return -n + first + last;
-    }
-
-  , getFrequency = function (baseFrequency, semitones) {
-      return baseFrequency * Math.pow(Math.pow(2, 1/12), semitones);
-    };
-
-Meteor.startup(function() {
-  Session.set('secondMenu', '');
-  Session.set('volume', 80);
-  Session.set('notes', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-  Session.set('rootNote', 0);
-  Session.set('baseFrequency', 27.5);
-  Session.set('noteHeight', 13);
-  Session.set('octave',  2);
-  Session.set('waveShapes', ['sine', 'triangle', 'sawtooth', 'square']);
-  Session.set('waveShape', 2);
-  Session.set('delay', 20);
-  Session.set('scales', {
-    'Chromatic': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-  , 'Major': [1, 3, 5, 6, 8, 10, 12, 13]
-  , 'Minor': [1, 3, 4, 6, 8, 9, 11, 13]
-  , 'Blues': [1, 4, 6, 7, 8, 11, 13]
-  , 'Lydian': [1, 3, 5, 7, 8, 10, 12, 13]
-  , 'Mixolydian': [1, 3, 5, 6, 8, 10, 11, 13]
-  , 'Octatonic A': [1, 3, 4, 6, 7, 9, 10, 12, 13]
-  , 'Octatonic B': [1, 2, 4, 5, 7, 8, 10, 11, 13]
-  , 'Whole Tone': [1, 3, 5, 7, 9, 11, 13]
-  });
-  Session.set('scale', Session.get('scales')['Chromatic']);
-
-
-
-  //ED'S STUFF
-  Session.set('tempo', 1000);
-  Session.set('key', "C");  //switch this to rootNote eventually?
-  Session.set('chordProgression',["I", "I", "I", "I","IV", "IV", "I", "I", "V", "IV", "I", "I"]);
-  Session.set('key', "A");  //switch this to rootNote eventually?
-  Session.set('chordProgressions', {
-    "12-Bar Blues": ["I", "I", "I", "I","IV", "IV", "I", "I", "V", "IV", "I", "I"]
-  , "50s": ["I", "vi", "IV", "V"]
-  , "Circle": ["I", "IV", "viio", "iii", "vi", "ii", "V", "I"]
-  , "Pop-Punk": ["I", "V", "vi", "IV"]
-  });
-  Session.set('chordProgression', Session.get("chordProgressions")["12-Bar Blues"]);
-  Session.set('mode', "Major"); //work this into scales
-
-
-
-});
-
-Template.notepad.helpers({
-  active: function () {
-    return Session.get('secondMenu');
-  }
-
-, volume: function () {
-    return Session.get('volume');
-  }
-
-, octave: function () {
-    return Session.get('octave');
-  }
-
-, rootNote: function () {
-    if (Session.get('notes')) {
-      return Session.get('notes')[Session.get('rootNote')];
-    }
-  }
-
-, rootNoteValue: function () {
-    return Session.get('rootNote');
- }
-
-, waveShape: function () {
-    if (Session.get('waveShapes')) {
-      return Session.get('waveShapes')[Session.get('waveShape')];
-    }
-  }
-
-, waveShapeValue: function () {
-    return Session.get('waveShape');
-  }
-
-, delay: function () {
-    return Session.get('delay');
-  }
-
-, scales: function () {
-    var scales = [];
-    for (key in Session.get('scales')) {
-      scales.push(key);
-    }
-    return scales;
-  }
-
-, tempo: function() {
-    return Session.get('tempo');
-  }
-
-, chordProgression: function () {
-    var chords = [];
-    for (key in Session.get('chordProgressions')) {
-      chords.push(key);
-    }
-    return chords;
-  }
-
-, bpm: function() {
-    return flipSetPosition(Math.floor(Session.get('tempo') / 10), 60, 200);
-  }
-
-, bars: function() {
-    return Session.get('chordProgression');
-  }
-});
-
-Template.notepad.events({
-
-  // Sliders
-  'mousedown input, mousemove input': function (event) {
-    Session.set(event.target.id, +event.target.value);
-  }
-
-, 'change .scale': function (event) {
-    var scale = Session.get('scales')[event.target.value];
-    Session.set('scale', scale);
-    Session.set('noteHeight', scale.length);
-  }
-
-, 'change .chordProgression': function (event) {
-    var chord = Session.get('chordProgressions')[event.target.value];
-    Session.set('chordProgression', chord);
-  }
-
-, 'change .switch input': function (event) {
-    Session.set('secondMenu', Session.get('secondMenu') === '' ? 'active' : '');
-    if (Session.get('secondMenu') === 'active') {
-      $('.second-menu').css('opacity', 1)
-    }
-
-    else {
-      setTimeout(function() {
-        $('.second-menu').css('opacity', 0);
-      }, 700);
-    }
-  }
-});
-
 Template.notepad.rendered = function() {
 
 var audioContext = new (window.AudioContext || window.webkitAudioContext)()
-
 
   // iOS requires user input to trigger audio
   , audioPlaying = false
@@ -160,16 +8,13 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
   // oscillator
   , oscillator = audioContext.createOscillator()
-  , delay = audioContext.createDelay()
-  , feedback = audioContext.createGain()
   , gain = audioContext.createGain()
 
-
+  // loop
   , intervalId
   , playing = false
 
-
-  // ED'S VARIABLES
+  // ed's
   , notesArray = ['A', 'Bb', 'B', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab']
   , soundsCurrentlyPlaying = []
   , chordsToPlay = []
@@ -200,7 +45,6 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
           ] + Session.get('rootNote')
         );
 
-      feedback.gain.value = Session.get('volume') / 100;
       gain.gain.value = Session.get('volume') / 100;
 
       // temporarily remove top layer
@@ -215,18 +59,6 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
         }
         else {
           gain.gain.value = 0;
-          clearInterval(fader);
-        }
-      }, speed);
-    }
-
-  , fadeFeedback = function (feedback, speed) {
-      var fader = setInterval(function() {
-        if (feedback.gain.value > 0) {
-          feedback.gain.value -= 0.01;
-        }
-        else {
-          feedback.gain.value = 0;
           clearInterval(fader);
         }
       }, speed);
@@ -323,22 +155,22 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
   function generateMode(key, mode) {
 
     var notesArray = [
-      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
-      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
-      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
-      "C"]
+      'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B',
+      'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B',
+      'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B',
+      'C']
 
       , modesArrays = {
-        "Major" : [0, 2, 4, 5, 7, 9, 11],
-        "Minor" : [0, 2, 3, 5, 7, 8, 10],
-        "Blues" : [0, 3, 5, 6, 7, 9, 10],
-        "Ionian" : [0, 2, 4, 5, 7, 9, 11],
-        "Dorian" : [2, 4, 5, 7, 9, 11, 12],
-        "Phrygian" : [4, 5, 7, 9, 11, 12, 14],
-        "Lydian" : [5, 7, 9, 11, 12, 14, 16],
-        "Mixolydian" : [7, 9, 11, 12, 14, 16, 17],
-        "Aeolian" : [9, 11, 12, 14, 16, 17, 19],
-        "Locrian" : [11, 12, 14, 16, 17, 19, 21],
+        'Major' : [0, 2, 4, 5, 7, 9, 11],
+        'Minor' : [0, 2, 3, 5, 7, 8, 10],
+        'Blues' : [0, 3, 5, 6, 7, 9, 10],
+        'Ionian' : [0, 2, 4, 5, 7, 9, 11],
+        'Dorian' : [2, 4, 5, 7, 9, 11, 12],
+        'Phrygian' : [4, 5, 7, 9, 11, 12, 14],
+        'Lydian' : [5, 7, 9, 11, 12, 14, 16],
+        'Mixolydian' : [7, 9, 11, 12, 14, 16, 17],
+        'Aeolian' : [9, 11, 12, 14, 16, 17, 19],
+        'Locrian' : [11, 12, 14, 16, 17, 19, 21],
       }
       , keyNumber = notesArray.indexOf(key)
       , result = [];
@@ -351,32 +183,31 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
 function generateChord(chord, key, mode) {
   var notesArray = [
-    "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
-    "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
-    "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
-    "C"]
+    'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B',
+    'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B',
+    'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B',
+    'C']
     , chordsArrays = {
-      "maj": [0, 4, 7],
-      "min": [0, 3, 7],
-      "7": [0, 4, 7, 10],
-      "maj7":  [0, 4, 7, 11],
-      "min7": [0, 3, 7, 10],
-      "dim": [0, 3, 6],
-      "o": [0, 3, 6],
-      "aug": [0, 4, 8],
-      "+": [0, 4, 8],
-      "sus4": [0, 5, 7],
-      "add2": [0, 2, 4, 7]
+      'maj': [0, 4, 7],
+      'min': [0, 3, 7],
+      '7': [0, 4, 7, 10],
+      'maj7':  [0, 4, 7, 11],
+      'min7': [0, 3, 7, 10],
+      'dim': [0, 3, 6],
+      'o': [0, 3, 6],
+      'aug': [0, 4, 8],
+      '+': [0, 4, 8],
+      'sus4': [0, 5, 7],
+      'add2': [0, 2, 4, 7]
     }
     , numericChordsArray = [
-      "I", "II", "III", "IV", "V", "VI", "VII", "i", "ii", "iii", "iv", "v", "vi", "vii"
+      'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'
     ]
     , keyNumber = notesArray.indexOf(key)
     , numericChordNumber
     , mode = generateMode(key, mode)
-    , chordType = ""  //maj7, aug, etc
-    , result = []
-    ;
+    , chordType = ''  //maj7, aug, etc
+    , result = [];
 
     //scan through the chord string until additional note characters (ie: 7, aug, min7) are either found or not
     for (var x = 0; x < chord.length; x++) {
@@ -396,14 +227,14 @@ function generateChord(chord, key, mode) {
       }
     }
     //if the chord wasn't weird, assign it either major or minor
-    if (chordType == "") {
-      chordType = (numericChordNumber < 7) ? "maj" : "min";
+    if (chordType == '') {
+      chordType = (numericChordNumber < 7) ? 'maj' : 'min';
     }
     //if it's a minor chord, fix up a problem with assigning the min7 chord, if applicable
     //then, prep numericChordNumber for the big push
     if (numericChordNumber >= 7) {
-      if (chordType == "7") {
-        chordType = "min7";
+      if (chordType == '7') {
+        chordType = 'min7';
       }
       numericChordNumber -= 7;
     }
@@ -415,10 +246,6 @@ function generateChord(chord, key, mode) {
     }
     return result;
   }
-
-
-
-
 
     function BufferLoader(context, urlList, callback) {
       this.context = context;
@@ -434,8 +261,8 @@ function generateChord(chord, key, mode) {
     BufferLoader.prototype.loadBuffer = function(url, index) {
       // Load buffer asynchronously
       var request = new XMLHttpRequest();
-      request.open("GET", url, true);
-      request.responseType = "arraybuffer";
+      request.open('GET', url, true);
+      request.responseType = 'arraybuffer';
 
       var loader = this;
 
@@ -474,15 +301,14 @@ function bufferCallback(bufferList){
   for (var x = 0, len = bufferList.length; x < len; x++) {
     noteSamples[notesArray[x]] = bufferList[x];
   }
-  $("#playChordProgressionButton")
-    .html('<i class="mdi-av-play-arrow"></i>').removeAttr("disabled");
-  $("#stopChordProgressionButton").removeAttr("disabled");
+  $('#playChordProgressionButton')
+    .html('<i class="mdi-av-play-arrow"></i>').removeAttr('disabled');
+  $('#stopChordProgressionButton').removeAttr('disabled');
 }
 
 function playSound(buffer, when, offset, duration) {
   var source = audioContext.createBufferSource();
   source.buffer = buffer;
-  //source.loop = true;
   source.connect(audioContext.destination);
   source.start(when, offset, duration);
   return source;
@@ -490,7 +316,7 @@ function playSound(buffer, when, offset, duration) {
 
 function playChordProgression() {
   var chordProgression = Session.get('chordProgression');
-  var tempo = Session.get("tempo");
+  var tempo = Session.get('tempo');
   chordsToPlay = [];
   stopChordProgression();
   for (var x = 0, len = chordProgression.length; x < len; x++) {
@@ -543,7 +369,6 @@ function stopChordProgression() {
 }
 
 /*
-//
 //  END OF ED'S STUFF
 //
 */
@@ -573,14 +398,8 @@ function stopChordProgression() {
   // initialize audio
   oscillator.type = Session.get('waveShapes')[Session.get('waveShape')];
   oscillator.frequency.value = Session.get('baseFrequency'); // value in hertz
-  delay.delayTime.value = Session.get('delay') / 1000;
-  feedback.gain.value = Session.get('volume') / 100;
   gain.gain.value = Session.get('volume') / 100;
 
-  // oscillator.connect(delay);
-  // delay.connect(feedback);
-  // feedback.connect(delay);
-  // delay.connect(gain);
   oscillator.connect(gain);
   gain.connect(audioContext.destination);
 
@@ -608,7 +427,7 @@ function stopChordProgression() {
   var bufferLoader;
   var soundFilesArray = [];
   for (var x = 0, len = notesArray.length; x < len; x++) {
-    soundFilesArray.push("SFX/" + notesArray[x] + ".mp3");
+    soundFilesArray.push('SFX/' + notesArray[x] + '.mp3');
   }
   bufferLoader = new BufferLoader(audioContext, soundFilesArray, bufferCallback);
   bufferLoader.load();
@@ -617,7 +436,6 @@ function stopChordProgression() {
     if (event.target.id === 'playChordProgressionButton') {
       if (! soundsCurrentlyPlaying.length > 0) {
         playChordProgression();
-        //$("#playChordProgressionButton").attr("disabled", true);
       }
     }
   });
@@ -628,7 +446,7 @@ function stopChordProgression() {
     }
   });
 
-  $("#playChordProgressionButton").click(function(){
+  $('#playChordProgressionButton').click(function(){
     if (!playing) {
       $(this).html('<i class="mdi-av-stop"></i>');
       if (! soundsCurrentlyPlaying.length > 0) {

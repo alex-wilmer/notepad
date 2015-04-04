@@ -2,37 +2,22 @@ Template.notepad.helpers
   active: () ->
     Session.get('secondMenu')
 
-  volume: () ->
-    Session.get('volume')
-
-  octave: () ->
-    Session.get('octave')
-
-  rootNote: () ->
-    if (Session.get('notes'))
+  key: () ->
+    if Session.get('notes')
       Session.get('notes')[Session.get('rootNote')]
 
-  rootNoteValue: () ->
-    Session.get('rootNote')
-
-  waveShape: () ->
-    if (Session.get('waveShapes'))
+  waveShapeName: () ->
+    if Session.get('waveShapes')
       Session.get('waveShapes')[Session.get('waveShape')]
 
-  waveShapeValue: () ->
+  waveShape: () ->
     Session.get('waveShape')
-
-  delay: () ->
-    Session.get('delay')
 
   scales: () ->
     scales = []
     for key of Session.get('scales')
       scales.push(key)
     scales
-
-  tempo: () ->
-    Session.get('tempo')
 
   chordProgression: () ->
     chords = []

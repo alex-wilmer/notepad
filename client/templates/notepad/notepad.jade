@@ -31,29 +31,24 @@ template(name='notepad')
 
     .first-menu.menu.z-depth-2
       .volume
-        .label VOLUME &nbsp; #{volume}
+        .label VOLUME &nbsp; {{$ "volume"}}
         p.range-field
-          input#volume(type='range' min='0' max='100', value='{{volume}}')
+          input#volume(type='range' min='0' max='100', value='{{$ "volume"}}')
 
       .octave
-        .label OCTAVE &nbsp; #{octave}
+        .label OCTAVE &nbsp; {{$ "octave"}}
         p.range-field
-          input#octave(type='range' min='0' max='5', value='{{octave}}')
-
-      .root-note
-        .label ROOTNOTE &nbsp; #{rootNote}
-        p.range-field
-          input#rootNote(type='range' min='0' max='11', value='{{rootNoteValue}}')
+          input#octave(type='range' min='0' max='5', value='{{$ "octave"}}')
 
       .wave-shape
-        .label #{waveShape}
+        .label #{waveShapeName}
         p.range-field
-          input#waveShape(type='range' min='0' max='3', value='{{waveShapeValue}}')
+          input#waveShape(type='range' min='0' max='3', value='{{$ "waveShape"}}')
 
-      .delay
-        .label DECAY #{delay}
+      .decay
+        .label DECAY {{$ "decay"}}
         p.range-field
-          input#delay(type='range' min='0' max='100', value='{{delay}}')
+          input#decay(type='range' min='0' max='100', value='{{$ "decay"}}')
 
       .scale
         select
@@ -77,6 +72,11 @@ template(name='notepad')
         select
           +each chordProgression
             option(value='{{this}}') #{this}
+
+      .root-note
+        .label KEY &nbsp; #{key}
+        p.range-field
+          input#rootNote(type='range' min='0' max='11', value='{{$ "rootNote"}}')
 
     canvas#reveal-layer.notepad.z-depth-2
     canvas#touch-layer.notepad.z-depth-3

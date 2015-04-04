@@ -29,7 +29,7 @@ Template.notepad.rendered = function() {
   , '50s': ['I', 'vi', 'IV', 'V']
   , 'Circle': ['I', 'IV', 'viio', 'iii', 'vi', 'ii', 'V', 'I']
   , 'Pop-Punk': ['I', 'V', 'vi', 'IV']
-  , 'Jazzy': ['imin7', 'Vmaj7', 'iio', 'V7']
+  , 'Jazzy': ['imin7', 'VImaj7', 'iio', 'V7']
   , 'Airy': ['Imaj7', 'IVmaj7']
   , '8 bar blues': ['I', 'V7', 'IV7', 'IV7', 'I', 'V7', 'I', 'V7']
   , 'Jazz TurnARound': ['I', 'VI', 'II', 'V', 'I', 'V', 'II', 'V']

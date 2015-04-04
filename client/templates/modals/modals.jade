@@ -1,0 +1,30 @@
+template(name='modals')
+  #help.modal
+    .modal-content
+      h4 Welcome!
+      p.
+        Cupidatat velit magna id esse consectetur. Eu ea velit occaecat tempor veniam minim non incididunt adipisicing consectetur officia qui in. Fugiat qui ut exercitation dolor excepteur elit ad amet do consectetur. Occaecat officia adipisicing officia velit dolore tempor do. Anim sunt sit amet in incididunt non laboris sint minim consectetur ipsum elit. Qui id ex consectetur magna sint consectetur proident aliquip nulla Lorem nostrud enim quis nisi.
+
+  #save.modal
+    .modal-content
+      h4 Save Settings
+      form.save-settings
+        .input-field
+          input#settingName(type='text' autofocus)
+          label(for='settingName') Name
+        a.cancel.waves-effect.waves-light.btn.red CANCEL
+        input.sign-out.waves-effect.waves-light.btn(type='submit' value='SAVE')
+
+  #load.modal
+    .modal-content.settings
+      h4 Load Patch
+
+      form.load-setting
+        .settings-list
+          +each settings
+            .setting
+              input(name='settings' type='radio' id='{{name}}' checked='{{equals name currentSetting}}')
+              label(for='{{name}}') #{name}
+
+        a.cancel.waves-effect.waves-light.btn.red CANCEL
+        input.sign-out.waves-effect.waves-light.btn(type='submit' value='LOAD')

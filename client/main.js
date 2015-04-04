@@ -372,6 +372,12 @@ Template.notepad.rendered = function() {
     $('.modal-trigger').leanModal();
   }, 0);
 
+  Accounts.onLogin(function () {
+    setTimeout(function () {
+      $('.modal-trigger').leanModal();
+    }, 0);
+  });
+
   // initialize audio
   oscillator.type = Session.get('waveShapes')[Session.get('waveShape')];
   oscillator.frequency.value = Session.get('baseFrequency'); // value in hertz
@@ -405,7 +411,7 @@ Template.notepad.rendered = function() {
     }
   });
 
-  $('#playChords').click(function(){
+  $('#playChords').click(function (){
     if (!playing) {
       $(this).html('<i class="mdi-av-stop"></i>');
       if (! soundsCurrentlyPlaying.length > 0) {

@@ -1,7 +1,10 @@
 template(name='notepad')
-  +login
+  +users
 
   .help
+    a.github(href='https://github.com/alex-wilmer/notepad')
+      i.fa.fa-github.fa-3x
+
     a.modal-trigger(href='#help')
       i.mdi-action-help
 
@@ -15,6 +18,14 @@ template(name='notepad')
           input(type='checkbox' checked)
           span.lever
           i.mdi-av-queue-music
+
+      if currentUser
+        .file
+          .load
+            a.waves-effect.waves-light.btn.modal-trigger(href='#load') LOAD
+
+          .save
+            a.waves-effect.waves-light.btn.modal-trigger(href='#save') SAVE
 
       .transport
         a#record.waves-effect.waves-light.btn.purple
@@ -54,13 +65,6 @@ template(name='notepad')
         select
           +each scales
             option(value='{{this}}') #{this}
-
-      .file
-        .load
-          a.waves-effect.waves-light.btn.modal-trigger(href='#load') LOAD
-
-        .save
-          a.waves-effect.waves-light.btn.modal-trigger(href='#save') SAVE
 
     .second-menu.menu(class='{{active}}')
       .tempo

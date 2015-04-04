@@ -1,3 +1,6 @@
+@log = (a) ->
+  console.log a
+
 @flipSetPosition = (n, first, last) ->
   first + last - n
 

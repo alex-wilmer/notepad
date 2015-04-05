@@ -15,6 +15,10 @@ Template.notepad.events({
     Session.set('chordProgression', chord);
   }
 
+, 'change .chordSound': function (event) {;
+    Session.set('chordSound', event.target.value);
+  }
+
 , 'change .switch input': function (event) {
     Session.set('secondMenu', Session.get('secondMenu') === '' ? 'active' : '');
     if (Session.get('secondMenu') === 'active') {

@@ -82,5 +82,10 @@ template(name='notepad')
         p.range-field
           input#rootNote(type='range' min='0' max='11', value='{{$ "rootNote"}}')
 
+      .chordSound
+        select
+          +each chordSounds
+            option(value='{{this}}') #{this}
+
     canvas#reveal-layer.notepad.z-depth-2
     canvas#touch-layer.notepad.z-depth-3

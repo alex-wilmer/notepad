@@ -36,6 +36,8 @@ Template.notepad.rendered = function() {
   });
   Session.set('chordProgression', Session.get('chordProgressions')['12-Bar Blues']);
   Session.set('mode', 'Ionian');
+  Session.set('chordSounds', ['Organ', 'Piano']);
+  Session.set('chordSound', 'Organ');
 
   var audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
@@ -258,22 +260,24 @@ Template.notepad.rendered = function() {
         return result;
       }
 
-    , bufferCallback = function (bufferList) {
-        bufferList.forEach(function (buffer, index) {
-          noteSamples[Session.get('notes')[index]] = buffer;
-        });
+    , generateBuffer = function () {
+        var bufferCallback = function (bufferList) {
+            bufferList.forEach(function (buffer, index) {
+              noteSamples[Session.get('notes')[index]] = buffer;
+            });
+          }
+
+        , soundFiles = (function() {
+            var result = [];
+            for (var i = 0; i < 12; i += 1) {
+              result.push('SFX/' + Session.get('chordSound').toLowerCase() + i + '.mp3');
+            }
+            return result;
+          }())
+
+        return bufferLoader =
+            new BufferLoader(audioContext, soundFiles, bufferCallback)
       }
-
-    , soundFiles = (function() {
-        var result = [];
-        for (var i = 0; i < 12; i += 1) {
-          result.push('SFX/note' + i + '.mp3');
-        }
-        return result;
-      }())
-
-    , bufferLoader =
-        new BufferLoader(audioContext, soundFiles, bufferCallback)
 
     , playSound = function (buffer, when, offset, duration) {
         var source = audioContext.createBufferSource();
@@ -389,6 +393,7 @@ Template.notepad.rendered = function() {
   gain.connect(audioContext.destination);
 
   // Load chord audio files
+  bufferLoader = generateBuffer();
   bufferLoader.load();
 
   // exposed events
@@ -402,6 +407,13 @@ Template.notepad.rendered = function() {
     setTimeout(function() {
       drawNotes(Session.get('noteHeight'));
       toggleGrid(Session.get('noteHeight'));
+    }, 0);
+  });
+
+  $('.chordSound select').change(function() {
+    setTimeout(function() {
+      bufferLoader = generateBuffer();
+      bufferLoader.load();
     }, 0);
   });
 

@@ -30,3 +30,6 @@ Template.notepad.helpers
 
   bars: () ->
     Session.get('chordProgression')
+
+  chordSounds: () ->
+    Session.get('chordSounds')

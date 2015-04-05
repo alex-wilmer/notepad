@@ -24,6 +24,7 @@ Template.modals.events({
     , tempo: Session.get('tempo')
     , chordProgression: Session.get('chordProgression')
     , mode: Session.get('mode')
+    , song: Session.get('song')
     };
 
     Settings.insert(settings, function() {

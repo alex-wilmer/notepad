@@ -2,6 +2,7 @@ Template.notepad.rendered = function() {
   Session.set('secondMenu', '');
   Session.set('baseFrequency', 27.5);
   Session.set('volume', 80);
+  Session.set('chordVolume', 80);
   Session.set('notes'
   , ['A', 'B♭', 'B', 'C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭']
   );
@@ -216,7 +217,7 @@ Template.notepad.rendered = function() {
               'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'
             , 'i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'
             ]
-          , numericChordNumber
+          , numericChordNumber = undefined
           , mode = generateMode(key, mode)
           , chordType = ''  //maj7, aug, etc
           , result = [];
@@ -280,7 +281,11 @@ Template.notepad.rendered = function() {
       }
 
     , playSound = function (buffer, when, offset, duration) {
-        var source = audioContext.createBufferSource();
+        var source = audioContext.createBufferSource()
+          , gain = audioContext.createGainNode();
+
+        gain.gain.value = Session.get('chordVolume');
+
         source.buffer = buffer;
         source.connect(audioContext.destination);
         source.start(when, offset, duration);

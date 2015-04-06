@@ -3,7 +3,7 @@ Template.notepad.rendered = function() {
   Session.set('baseFrequency', 27.5);
   Session.set('volume', 80);
   Session.set('notes'
-  , ['A', 'B♭', 'B', 'C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭']
+  , ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭']
   );
   Session.set('rootNote', 0);
   Session.set('noteHeight', 13);
@@ -69,6 +69,11 @@ Template.notepad.rendered = function() {
           canvasContext.rect(0, i * noteY, notepad.width, noteY);
           canvasContext.fillStyle = '#2b2b2b';
           canvasContext.fill();
+
+          //draw letters on notes
+          canvasContext.font = "1.5em Bangers";
+          canvasContext.fillStyle = "rgb(33, 199, 148)";
+          canvasContext.fillText(Session.get("notes")[Session.get("scale")[(noteHeight - 1) - i] + Session.get("rootNote") - 1], 10, i * noteY + (noteY * 3 / 4));
         }
       }
 
@@ -403,7 +408,7 @@ Template.notepad.rendered = function() {
     }, 0);
   });
 
-  $('select').change(function() {
+  $('select, #rootNote').change(function() {
     setTimeout(function() {
       drawNotes(Session.get('noteHeight'));
       toggleGrid(Session.get('noteHeight'));
@@ -438,4 +443,5 @@ Template.notepad.rendered = function() {
       stopChordProgression();
     }
   });
+
 }

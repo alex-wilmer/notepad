@@ -1,7 +1,7 @@
 Template.users.helpers({
   userName: function () {
     if (Meteor.user()) {
-      var name = Meteor.user().profile || Meteor.user().username || '';
+      var name = Meteor.user().profile.name || Meteor.user().username || '';
       return name;
     }
   }

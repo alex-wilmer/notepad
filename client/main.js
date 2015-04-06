@@ -282,7 +282,7 @@ Template.notepad.rendered = function() {
 
     , playSound = function (buffer, when, offset, duration) {
         var source = audioContext.createBufferSource()
-          , gain = audioContext.createGainNode();
+          , gain = audioContext.createGain();
 
         gain.gain.value = Session.get('chordVolume');
 

@@ -2,22 +2,11 @@ Template.notepad.helpers
   active: () ->
     Session.get('secondMenu')
 
-  key: () ->
-    if Session.get('notes')
-      Session.get('notes')[Session.get('rootNote')]
+  bars: () ->
+    Session.get('chordProgression')
 
-  waveShapeName: () ->
-    if Session.get('waveShapes')
-      Session.get('waveShapes')[Session.get('waveShape')]
-
-  waveShape: () ->
-    Session.get('waveShape')
-
-  scales: () ->
-    scales = []
-    for key of Session.get('scales')
-      scales.push(key)
-    scales
+  bpm: () ->
+    flipSetPosition(Math.floor(Session.get('tempo') / 10), 60, 200)
 
   chordProgression: () ->
     chords = []
@@ -25,11 +14,22 @@ Template.notepad.helpers
       chords.push(key)
     chords
 
-  bpm: () ->
-    flipSetPosition(Math.floor(Session.get('tempo') / 10), 60, 200)
-
-  bars: () ->
-    Session.get('chordProgression')
-
   chordSounds: () ->
     Session.get('chordSounds')
+
+  key: () ->
+    if Session.get('notes')
+      Session.get('notes')[Session.get('rootNote')]
+
+  scales: () ->
+    scales = []
+    for key of Session.get('scales')
+      scales.push(key)
+    scales
+
+  waveShape: () ->
+    Session.get('waveShape')
+
+  waveShapeName: () ->
+    if Session.get('waveShapes')
+      Session.get('waveShapes')[Session.get('waveShape')]
